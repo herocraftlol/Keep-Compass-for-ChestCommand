@@ -9,14 +9,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class CompassHotbar extends JavaPlugin {
 
     private static CompassHotbar instance;
-    private boolean pluginEnabled = true;
+    private boolean enabled = true;
     private static final int COMPASS_SLOT = 8;
 
     @Override
     public void onEnable() {
         instance = this;
         saveDefaultConfig();
-        pluginEnabled = getConfig().getBoolean("enabled", true);
+        enabled = getConfig().getBoolean("enabled", true);
 
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 
@@ -40,11 +40,11 @@ public class CompassHotbar extends JavaPlugin {
     }
 
     public boolean isPluginEnabled() {
-        return pluginEnabled;
+        return enabled;
     }
 
     public void setPluginEnabled(boolean enabled) {
-        this.pluginEnabled = enabled;
+        this.enabled = enabled;
         getConfig().set("enabled", enabled);
         saveConfig();
 
@@ -60,7 +60,7 @@ public class CompassHotbar extends JavaPlugin {
     }
 
     public void giveCompass(Player player) {
-        if (!pluginEnabled) return;
+        if (!enabled) return;
         if (!player.hasPermission("compasshotbar.use")) return;
 
         PlayerInventory inventory = player.getInventory();
@@ -78,7 +78,7 @@ public class CompassHotbar extends JavaPlugin {
     }
 
     public void ensureCompassInSlot(Player player) {
-        if (!pluginEnabled) return;
+        if (!enabled) return;
         if (!player.hasPermission("compasshotbar.use")) return;
 
         PlayerInventory inventory = player.getInventory();

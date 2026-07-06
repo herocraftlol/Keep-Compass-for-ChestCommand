@@ -37,7 +37,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        Player player = event.getPlayer();
+        Player player = event.getPlayer();;
         if (plugin.isPluginEnabled()) {
             plugin.giveCompass(player);
         }
@@ -53,6 +53,7 @@ public class PlayerListener implements Listener {
 
         if (compass != null && compass.getType() == Material.COMPASS) {
             event.getDrops().remove(compass);
+            event.setKeepInventory(true);
         }
     }
 
@@ -76,36 +77,25 @@ public class PlayerListener implements Listener {
         if (!plugin.isPluginEnabled()) return;
         if (!player.hasPermission("compasshotbar.use")) return;
 
-        if (event.getSlot() == COMPASS_SLOT) {
+        // On ne protège la boussole QUE si le clic se fait directement
+        // dans l'inventaire du joueur (pas dans un coffre, une table de craft, etc.)
+        // et précisément sur le slot 8.
+        if (event.getClickedInventory() instanceof PlayerInventory playerInv
+                && playerInv == player.getInventory()
+                && event.getSlot() == COMPASS_SLOT) {
+
             ItemStack currentItem = event.getCurrentItem();
 
             if (currentItem != null && currentItem.getType() == Material.COMPASS) {
+                // Bloquer les déplacements (shift-clic, move_to_other_inventory…)
                 if (event.isShiftClick() || event.getAction().name().contains("MOVE")) {
                     event.setCancelled(true);
                     return;
                 }
 
-                if (event.getClickedInventory() != null && 
-                    event.getClickedInventory().getType() == InventoryType.PLAYER) {
-                    
-                    if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
-                        ItemStack cursorItem = event.getCursor();
-                        event.setCancelled(true);
-                        player.getWorld().dropItemNaturally(player.getLocation(), cursorItem);
-                        player.setItemOnCursor(new ItemStack(Material.AIR));
-                        event.getClickedInventory().setItem(COMPASS_SLOT, 
-                            new ItemStack(Material.COMPASS));
-                    }
-                }
-            }
-        }
-
-        if (event.isShiftClick() && event.getClickedInventory() != null &&
-            event.getClickedInventory().getType() == InventoryType.PLAYER) {
-            
-            ItemStack clickedItem = event.getCurrentItem();
-            if (clickedItem != null && clickedItem.getType() == Material.COMPASS) {
-                if (event.getSlot() == COMPASS_SLOT) {
+                // Si le joueur essaie d'échanger un item avec la boussole via le curseur,
+                // on annule sans dropper l'item : l'item reste sur le curseur.
+                if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
                     event.setCancelled(true);
                 }
             }
@@ -118,13 +108,15 @@ public class PlayerListener implements Listener {
         if (!plugin.isPluginEnabled()) return;
         if (!player.hasPermission("compasshotbar.use")) return;
 
-        for (int slot : event.getRawSlots()) {
-            if (slot == COMPASS_SLOT || slot == COMPASS_SLOT + 36) {
-                ItemStack compass = player.getInventory().getItem(COMPASS_SLOT);
-                if (compass != null && compass.getType() == Material.COMPASS) {
-                    event.setCancelled(true);
-                    return;
-                }
+        ItemStack compass = player.getInventory().getItem(COMPASS_SLOT);
+        if (compass == null || compass.getType() != Material.COMPASS) return;
+
+        // Annuler le glissé uniquement s'il touche le slot 8 de l'inventaire du joueur.
+        for (int rawSlot : event.getRawSlots()) {
+            if (event.getView().getInventory(rawSlot) == player.getInventory()
+                    && event.getView().convertSlot(rawSlot) == COMPASS_SLOT) {
+                event.setCancelled(true);
+                return;
             }
         }
     }
