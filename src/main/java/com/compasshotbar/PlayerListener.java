@@ -1,5 +1,6 @@
 package com.compasshotbar;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -11,6 +12,7 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.inventory.ItemStack;
@@ -28,18 +30,46 @@ public class PlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        if (plugin.isPluginEnabled()) {
-            plugin.giveAllItems(player);
-        }
+        plugin.syncZoneState(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
+        plugin.syncZoneState(event.getPlayer());
+    }
+
+    /**
+     * Détecte les entrées/sorties de la zone (pos1/pos2) pour donner ou
+     * retirer les items de la hotbar en conséquence. On ne fait le calcul
+     * complet que si le joueur a changé de bloc, pour ne pas surcharger le
+     * serveur (PlayerMoveEvent se déclenche très souvent).
+     */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerMove(PlayerMoveEvent event) {
+        if (!plugin.isPluginEnabled()) return;
+
         Player player = event.getPlayer();
-        if (plugin.isPluginEnabled()) {
-            plugin.giveAllItems(player);
+        if (!player.hasPermission("compasshotbar.use")) return;
+
+        ZoneManager zone = plugin.getZoneManager();
+        if (!zone.isEnabled() || !zone.isConfigured()) return;
+
+        Location from = event.getFrom();
+        Location to = event.getTo();
+        if (to == null) return;
+
+        if (from.getWorld().equals(to.getWorld())
+                && from.getBlockX() == to.getBlockX()
+                && from.getBlockY() == to.getBlockY()
+                && from.getBlockZ() == to.getBlockZ()) {
+            return; // Pas de changement de bloc : rien à vérifier.
         }
+
+        boolean wasIn = zone.contains(from);
+        boolean isIn = zone.contains(to);
+        if (wasIn == isIn) return; // Toujours dans le même état (dedans ou dehors).
+
+        plugin.syncZoneState(player);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -176,10 +206,8 @@ public class PlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onServerLoad(ServerLoadEvent event) {
-        if (plugin.isPluginEnabled()) {
-            for (Player player : plugin.getServer().getOnlinePlayers()) {
-                plugin.giveAllItems(player);
-            }
+        for (Player player : plugin.getServer().getOnlinePlayers()) {
+            plugin.syncZoneState(player);
         }
     }
 }

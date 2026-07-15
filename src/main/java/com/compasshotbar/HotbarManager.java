@@ -143,6 +143,12 @@ public class HotbarManager {
         if (!plugin.isPluginEnabled()) return;
         if (!player.hasPermission("compasshotbar.use")) return;
 
+        ZoneManager zone = plugin.getZoneManager();
+        if (zone.isEnabled() && zone.isConfigured() && !zone.contains(player.getLocation())) {
+            // Le joueur est en dehors de la zone définie : on n'affiche rien.
+            return;
+        }
+
         PlayerInventory inventory = player.getInventory();
         for (HotbarItem item : items.values()) {
             if (!item.isEnabled()) continue;
@@ -167,6 +173,13 @@ public class HotbarManager {
     public void ensureAll(Player player) {
         if (!plugin.isPluginEnabled()) return;
         if (!player.hasPermission("compasshotbar.use")) return;
+
+        ZoneManager zone = plugin.getZoneManager();
+        if (zone.isEnabled() && zone.isConfigured() && !zone.contains(player.getLocation())) {
+            // Hors zone : on s'assure qu'aucun item du plugin ne traîne dans l'inventaire.
+            removeAll(player);
+            return;
+        }
 
         PlayerInventory inventory = player.getInventory();
         boolean restoredAny = false;

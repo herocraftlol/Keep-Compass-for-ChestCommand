@@ -10,6 +10,37 @@ restored-message: "&6[CompassHotbar] &aVos items ont été restaurés dans votre
 drop-blocked-message: "&6[CompassHotbar] &cVous ne pouvez pas lâcher cet item!"
 
 # ============================================================
+# Zone "lobby" (facultatif)
+# ============================================================
+# Si "enabled: true", les items de la hotbar ne s'affichent QUE lorsque le
+# joueur se trouve à l'intérieur de la zone définie par pos1/pos2 (bornes
+# incluses). Dès qu'il en sort, tous les items du plugin sont retirés de sa
+# hotbar ; ils réapparaissent automatiquement quand il y revient.
+#
+# Pour définir la zone en jeu (permission compasshotbar.command requise) :
+#   1. Regardez le premier bloc de coin de la zone, puis /compasshotbar pos1
+#   2. Regardez le bloc de coin opposé, puis /compasshotbar pos2
+#   3. /compasshotbar zone enable
+#
+# Autres commandes :
+#   /compasshotbar zone disable  -> désactive la restriction (hotbar partout)
+#   /compasshotbar zone info     -> affiche la zone actuellement définie
+#
+# Ces valeurs sont normalement gérées automatiquement par les commandes
+# ci-dessus, mais peuvent aussi être éditées ici directement.
+zone:
+  enabled: false
+  world: null
+  pos1:
+    x: 0
+    y: 0
+    z: 0
+  pos2:
+    x: 0
+    y: 0
+    z: 0
+
+# ============================================================
 # Items fixes de la hotbar
 # ============================================================
 # Chaque entrée définit un item protégé (impossible à lâcher/déplacer)
