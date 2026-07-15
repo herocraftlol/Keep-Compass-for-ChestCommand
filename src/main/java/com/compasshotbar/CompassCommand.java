@@ -36,9 +36,9 @@ public class CompassCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage("§6[CompassHotbar] §aLe plugin est maintenant " + stateMessage + "§a!");
             
             if (newState) {
-                sender.sendMessage("§6[CompassHotbar] §7Tous les joueurs vont recevoir une boussole.");
+                sender.sendMessage("§6[CompassHotbar] §7Tous les joueurs vont recevoir les items configurés.");
             } else {
-                sender.sendMessage("§6[CompassHotbar] §7Les boussoles vont être retirées.");
+                sender.sendMessage("§6[CompassHotbar] §7Les items configurés vont être retirés.");
             }
             return true;
         }
@@ -51,7 +51,7 @@ public class CompassCommand implements CommandExecutor, TabCompleter {
                     sender.sendMessage("§cVous n'avez pas la permission d'utiliser cette commande.");
                     return true;
                 }
-                plugin.reloadConfig();
+                plugin.reloadHotbarConfig();
                 plugin.setPluginEnabled(plugin.getConfig().getBoolean("enabled", true));
                 sender.sendMessage("§6[CompassHotbar] §aConfiguration rechargée!");
                 break;
@@ -63,9 +63,9 @@ public class CompassCommand implements CommandExecutor, TabCompleter {
                 }
                 if (plugin.isPluginEnabled()) {
                     for (Player player : plugin.getServer().getOnlinePlayers()) {
-                        plugin.giveCompass(player);
+                        plugin.giveAllItems(player);
                     }
-                    sender.sendMessage("§6[CompassHotbar] §aUne boussole a été donnée à tous les joueurs!");
+                    sender.sendMessage("§6[CompassHotbar] §aLes items ont été donnés à tous les joueurs!");
                 } else {
                     sender.sendMessage("§6[CompassHotbar] §cLe plugin est désactivé!");
                 }

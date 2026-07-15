@@ -1,6 +1,5 @@
 package com.compasshotbar;
 
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -9,7 +8,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -18,10 +16,11 @@ import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import java.util.Iterator;
+
 public class PlayerListener implements Listener {
 
     private final CompassHotbar plugin;
-    private static final int COMPASS_SLOT = 8;
 
     public PlayerListener(CompassHotbar plugin) {
         this.plugin = plugin;
@@ -31,15 +30,15 @@ public class PlayerListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         if (plugin.isPluginEnabled()) {
-            plugin.giveCompass(player);
+            plugin.giveAllItems(player);
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        Player player = event.getPlayer();;
+        Player player = event.getPlayer();
         if (plugin.isPluginEnabled()) {
-            plugin.giveCompass(player);
+            plugin.giveAllItems(player);
         }
     }
 
@@ -48,11 +47,19 @@ public class PlayerListener implements Listener {
         Player player = event.getEntity();
         if (!plugin.isPluginEnabled()) return;
 
-        PlayerInventory inventory = player.getInventory();
-        ItemStack compass = inventory.getItem(COMPASS_SLOT);
+        HotbarManager manager = plugin.getHotbarManager();
+        Iterator<ItemStack> drops = event.getDrops().iterator();
+        boolean removedAny = false;
 
-        if (compass != null && compass.getType() == Material.COMPASS) {
-            event.getDrops().remove(compass);
+        while (drops.hasNext()) {
+            ItemStack drop = drops.next();
+            if (manager.getItemId(drop) != null) {
+                drops.remove();
+                removedAny = true;
+            }
+        }
+
+        if (removedAny) {
             event.setKeepInventory(true);
         }
     }
@@ -64,10 +71,13 @@ public class PlayerListener implements Listener {
         if (!player.hasPermission("compasshotbar.use")) return;
 
         ItemStack droppedItem = event.getItemDrop().getItemStack();
+        String itemId = plugin.getHotbarManager().getItemId(droppedItem);
 
-        if (droppedItem.getType() == Material.COMPASS) {
+        if (itemId != null) {
             event.setCancelled(true);
-            player.sendMessage("§6[CompassHotbar] §cVous ne pouvez pas lâcher votre boussole!");
+            String message = plugin.getConfig().getString("drop-blocked-message",
+                    "&6[CompassHotbar] &cVous ne pouvez pas lâcher cet item!");
+            player.sendMessage(HotbarManager.colorize(message));
         }
     }
 
@@ -77,25 +87,24 @@ public class PlayerListener implements Listener {
         if (!plugin.isPluginEnabled()) return;
         if (!player.hasPermission("compasshotbar.use")) return;
 
-        // On ne protège la boussole QUE si le clic se fait directement
+        // On ne protège les items QUE si le clic se fait directement
         // dans l'inventaire du joueur (pas dans un coffre, une table de craft, etc.)
-        // et précisément sur le slot 8.
         if (event.getClickedInventory() instanceof PlayerInventory playerInv
-                && playerInv == player.getInventory()
-                && event.getSlot() == COMPASS_SLOT) {
+                && playerInv == player.getInventory()) {
 
             ItemStack currentItem = event.getCurrentItem();
+            String itemId = plugin.getHotbarManager().getItemId(currentItem);
 
-            if (currentItem != null && currentItem.getType() == Material.COMPASS) {
+            if (itemId != null) {
                 // Bloquer les déplacements (shift-clic, move_to_other_inventory…)
                 if (event.isShiftClick() || event.getAction().name().contains("MOVE")) {
                     event.setCancelled(true);
                     return;
                 }
 
-                // Si le joueur essaie d'échanger un item avec la boussole via le curseur,
+                // Si le joueur essaie d'échanger un item avec le curseur,
                 // on annule sans dropper l'item : l'item reste sur le curseur.
-                if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
+                if (event.getCursor() != null && event.getCursor().getType() != org.bukkit.Material.AIR) {
                     event.setCancelled(true);
                 }
             }
@@ -108,15 +117,18 @@ public class PlayerListener implements Listener {
         if (!plugin.isPluginEnabled()) return;
         if (!player.hasPermission("compasshotbar.use")) return;
 
-        ItemStack compass = player.getInventory().getItem(COMPASS_SLOT);
-        if (compass == null || compass.getType() != Material.COMPASS) return;
+        HotbarManager manager = plugin.getHotbarManager();
+        PlayerInventory inventory = player.getInventory();
 
-        // Annuler le glissé uniquement s'il touche le slot 8 de l'inventaire du joueur.
+        // Annuler le glissé s'il touche un slot occupé par un item du plugin.
         for (int rawSlot : event.getRawSlots()) {
-            if (event.getView().getInventory(rawSlot) == player.getInventory()
-                    && event.getView().convertSlot(rawSlot) == COMPASS_SLOT) {
-                event.setCancelled(true);
-                return;
+            if (event.getView().getInventory(rawSlot) == inventory) {
+                int slot = event.getView().convertSlot(rawSlot);
+                ItemStack current = inventory.getItem(slot);
+                if (manager.getItemId(current) != null) {
+                    event.setCancelled(true);
+                    return;
+                }
             }
         }
     }
@@ -127,11 +139,29 @@ public class PlayerListener implements Listener {
         if (!plugin.isPluginEnabled()) return;
         if (!player.hasPermission("compasshotbar.use")) return;
 
+        // Bukkit déclenche cet évènement pour la main principale ET la main
+        // secondaire : on ne traite que la main principale pour éviter un
+        // double envoi du lien / une double exécution de la commande.
+        if (event.getHand() != org.bukkit.inventory.EquipmentSlot.HAND) return;
+
         ItemStack item = event.getItem();
-        if (item != null && item.getType() == Material.COMPASS) {
-            if (event.getAction().name().contains("RIGHT")) {
-                plugin.ensureCompassInSlot(player);
+        if (item == null) return;
+
+        String itemId = plugin.getHotbarManager().getItemId(item);
+        if (itemId == null) return;
+
+        HotbarItem hotbarItem = plugin.getHotbarManager().getItem(itemId);
+        if (hotbarItem == null) return;
+
+        if (event.getAction().name().contains("RIGHT")) {
+            // On annule l'interaction par défaut (poser un bloc comme la toile
+            // d'araignée, etc.) uniquement pour les items qui ont une action
+            // (URL/commande). La boussole garde son comportement normal.
+            if (hotbarItem.getActionType() != HotbarItem.ActionType.NONE) {
+                event.setCancelled(true);
             }
+            plugin.ensureAllItems(player);
+            ActionHandler.executeFor(player, hotbarItem);
         }
     }
 
@@ -141,14 +171,14 @@ public class PlayerListener implements Listener {
         if (!plugin.isPluginEnabled()) return;
         if (!player.hasPermission("compasshotbar.use")) return;
 
-        plugin.ensureCompassInSlot(player);
+        plugin.ensureAllItems(player);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onServerLoad(ServerLoadEvent event) {
         if (plugin.isPluginEnabled()) {
             for (Player player : plugin.getServer().getOnlinePlayers()) {
-                plugin.giveCompass(player);
+                plugin.giveAllItems(player);
             }
         }
     }

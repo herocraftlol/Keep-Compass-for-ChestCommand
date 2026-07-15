@@ -1,8 +1,8 @@
 name: CompassHotbar
-version: 1.0.0
+version: 1.1.0
 main: com.compasshotbar.CompassHotbar
 api-version: '1.21'
-description: Keep a compass in the last slot of the hotbar
+description: Keep fixed clickable items (compass, shop, website, discord, friends...) in the hotbar
 author: Developer
 commands:
   compasshotbar:

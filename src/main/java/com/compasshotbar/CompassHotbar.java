@@ -1,16 +1,13 @@
 package com.compasshotbar;
 
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class CompassHotbar extends JavaPlugin {
 
     private static CompassHotbar instance;
     private boolean enabled = true;
-    private static final int COMPASS_SLOT = 8;
+    private HotbarManager hotbarManager;
 
     @Override
     public void onEnable() {
@@ -18,13 +15,15 @@ public class CompassHotbar extends JavaPlugin {
         saveDefaultConfig();
         enabled = getConfig().getBoolean("enabled", true);
 
+        hotbarManager = new HotbarManager(this);
+
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 
         getCommand("compasshotbar").setExecutor(new CompassCommand(this));
         getCommand("compasshotbar").setTabCompleter(new CompassTabCompleter());
 
         for (Player player : getServer().getOnlinePlayers()) {
-            giveCompass(player);
+            hotbarManager.giveAll(player);
         }
 
         getLogger().info("CompassHotbar has been enabled!");
@@ -39,6 +38,10 @@ public class CompassHotbar extends JavaPlugin {
         return instance;
     }
 
+    public HotbarManager getHotbarManager() {
+        return hotbarManager;
+    }
+
     public boolean isPluginEnabled() {
         return enabled;
     }
@@ -50,43 +53,40 @@ public class CompassHotbar extends JavaPlugin {
 
         if (!enabled) {
             for (Player player : getServer().getOnlinePlayers()) {
-                removeCompass(player);
+                hotbarManager.removeAll(player);
             }
         } else {
             for (Player player : getServer().getOnlinePlayers()) {
-                giveCompass(player);
+                hotbarManager.giveAll(player);
             }
         }
     }
 
-    public void giveCompass(Player player) {
-        if (!enabled) return;
-        if (!player.hasPermission("compasshotbar.use")) return;
-
-        PlayerInventory inventory = player.getInventory();
-        ItemStack compass = new ItemStack(Material.COMPASS);
-        inventory.setItem(COMPASS_SLOT, compass);
+    /**
+     * Donne tous les items configurés (boussole, boutique, site, discord, amis, ...)
+     * à un joueur.
+     */
+    public void giveAllItems(Player player) {
+        hotbarManager.giveAll(player);
     }
 
-    public void removeCompass(Player player) {
-        PlayerInventory inventory = player.getInventory();
-        ItemStack currentItem = inventory.getItem(COMPASS_SLOT);
-
-        if (currentItem != null && currentItem.getType() == Material.COMPASS) {
-            inventory.setItem(COMPASS_SLOT, null);
-        }
+    /**
+     * Retire tous les items gérés par le plugin de l'inventaire du joueur.
+     */
+    public void removeAllItems(Player player) {
+        hotbarManager.removeAll(player);
     }
 
-    public void ensureCompassInSlot(Player player) {
-        if (!enabled) return;
-        if (!player.hasPermission("compasshotbar.use")) return;
+    /**
+     * Vérifie que tous les items sont bien présents dans leurs slots et les
+     * restaure si besoin (avec message d'information).
+     */
+    public void ensureAllItems(Player player) {
+        hotbarManager.ensureAll(player);
+    }
 
-        PlayerInventory inventory = player.getInventory();
-        ItemStack currentItem = inventory.getItem(COMPASS_SLOT);
-
-        if (currentItem == null || currentItem.getType() != Material.COMPASS) {
-            giveCompass(player);
-            player.sendMessage("§6[CompassHotbar] §aVotre boussole a été restaurée dans votre hotbar!");
-        }
+    public void reloadHotbarConfig() {
+        reloadConfig();
+        hotbarManager.reload();
     }
 }
