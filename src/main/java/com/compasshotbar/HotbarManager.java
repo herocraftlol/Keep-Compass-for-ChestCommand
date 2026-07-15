@@ -144,7 +144,7 @@ public class HotbarManager {
         if (!player.hasPermission("compasshotbar.use")) return;
 
         ZoneManager zone = plugin.getZoneManager();
-        if (zone.isEnabled() && zone.isConfigured() && !zone.contains(player.getLocation())) {
+        if (zone.isRestrictionActive() && !zone.contains(player.getLocation())) {
             // Le joueur est en dehors de la zone définie : on n'affiche rien.
             return;
         }
@@ -175,7 +175,7 @@ public class HotbarManager {
         if (!player.hasPermission("compasshotbar.use")) return;
 
         ZoneManager zone = plugin.getZoneManager();
-        if (zone.isEnabled() && zone.isConfigured() && !zone.contains(player.getLocation())) {
+        if (zone.isRestrictionActive() && !zone.contains(player.getLocation())) {
             // Hors zone : on s'assure qu'aucun item du plugin ne traîne dans l'inventaire.
             removeAll(player);
             return;

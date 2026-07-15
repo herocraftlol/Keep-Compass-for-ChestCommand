@@ -3,8 +3,135 @@
 # Enable or disable the plugin by default (can be toggled with command)
 enabled: true
 
-# Message displayed when compass is restored
-restored-message: "&6[CompassHotbar] &aVotre boussole a été restaurée dans votre hotbar!"
+# Message affiché quand un item manquant est restauré dans la hotbar
+restored-message: "&6[CompassHotbar] &aVos items ont été restaurés dans votre hotbar!"
 
-# Message displayed when player tries to drop the compass
-drop-blocked-message: "&6[CompassHotbar] &cVous ne pouvez pas lâcher votre boussole!"
+# Message affiché quand un joueur essaie de lâcher un item du plugin
+drop-blocked-message: "&6[CompassHotbar] &cVous ne pouvez pas lâcher cet item!"
+
+# ============================================================
+# Mode global (prioritaire sur la zone)
+# ============================================================
+# Si "true", la hotbar s'affiche PARTOUT sur le serveur, même si une zone
+# "lobby" est configurée et activée ci-dessous : la restriction de zone est
+# alors totalement ignorée (sans effacer sa configuration).
+#
+# Changeable à chaud avec (permission compasshotbar.command requise) :
+#   /compasshotbar global on      -> hotbar partout, zone ignorée
+#   /compasshotbar global off     -> la restriction de zone (si activée) s'applique de nouveau
+#   /compasshotbar global status  -> affiche l'état actuel
+global-mode: false
+
+# ============================================================
+# Zone "lobby" (facultatif)
+# ============================================================
+# Si "enabled: true", les items de la hotbar ne s'affichent QUE lorsque le
+# joueur se trouve à l'intérieur de la zone définie par pos1/pos2 (bornes
+# incluses). Dès qu'il en sort, tous les items du plugin sont retirés de sa
+# hotbar ; ils réapparaissent automatiquement quand il y revient.
+#
+# Pour définir la zone en jeu (permission compasshotbar.command requise) :
+#   1. Regardez le premier bloc de coin de la zone, puis /compasshotbar pos1
+#   2. Regardez le bloc de coin opposé, puis /compasshotbar pos2
+#   3. /compasshotbar zone enable
+#
+# Autres commandes :
+#   /compasshotbar zone disable  -> désactive la restriction (hotbar partout)
+#   /compasshotbar zone info     -> affiche la zone actuellement définie
+#
+# Ces valeurs sont normalement gérées automatiquement par les commandes
+# ci-dessus, mais peuvent aussi être éditées ici directement.
+#
+# Note : si "global-mode: true" (voir plus haut), cette restriction de zone
+# est ignorée, même si "zone.enabled: true".
+zone:
+  enabled: false
+  world: null
+  pos1:
+    x: 0
+    y: 0
+    z: 0
+  pos2:
+    x: 0
+    y: 0
+    z: 0
+
+# ============================================================
+# Items fixes de la hotbar
+# ============================================================
+# Chaque entrée définit un item protégé (impossible à lâcher/déplacer)
+# qui est automatiquement (re)placé dans le slot indiqué.
+#
+# - slot        : 0 à 8 (0 = tout à gauche, 8 = tout à droite de la hotbar)
+# - material    : n'importe quel Material Bukkit (ex: EMERALD, COBWEB, HEART_OF_THE_SEA...)
+# - name / lore : supportent les codes couleur avec "&"
+# - url         : si renseigné, un clic droit envoie un message cliquable
+#                 dans le chat qui ouvre ce lien dans le navigateur du joueur.
+#                 (Minecraft Java ne permet pas d'ouvrir un navigateur sans
+#                 interaction du joueur : cliquer sur le message est l'action
+#                 la plus proche d'un lien "direct" possible côté client.)
+# - command     : si renseigné (et pas d'url), la commande est exécutée
+#                 en tant que joueur lors du clic droit (sans le "/").
+# - click-message : message cliquable personnalisé pour les items "url"
+#                   (optionnel, sinon un message par défaut est utilisé).
+# - actionbar-message : petit rappel affiché au-dessus de la hotbar au clic
+#                        droit (optionnel). Pour "url", un texte par défaut
+#                        est utilisé si non renseigné.
+# - sound       : son joué au clic droit (optionnel). Doit correspondre à un
+#                 nom de l'enum Bukkit Sound (ex: ENTITY_EXPERIENCE_ORB_PICKUP,
+#                 UI_BUTTON_CLICK, BLOCK_NOTE_BLOCK_PLING...). Par défaut :
+#                 ENTITY_EXPERIENCE_ORB_PICKUP pour les liens, UI_BUTTON_CLICK
+#                 pour les commandes.
+hotbar-items:
+
+  compass:
+    enabled: true
+    slot: 8
+    material: COMPASS
+
+  shop:
+    enabled: true
+    slot: 0
+    material: EMERALD
+    name: "&a&lBoutique"
+    lore:
+      - "&7Clique-droit pour accéder"
+      - "&7à la boutique du serveur"
+    url: "https://votre-boutique.tebex.io"
+    click-message: "&a&l✔ &fClique ici pour ouvrir la &a&lBoutique&f !"
+    actionbar-message: "&e➤ &fClique sur le lien dans le chat pour ouvrir la boutique !"
+    sound: "ENTITY_EXPERIENCE_ORB_PICKUP"
+
+  website:
+    enabled: true
+    slot: 1
+    material: COBWEB
+    name: "&f&lSite Web"
+    lore:
+      - "&7Clique-droit pour visiter"
+      - "&7notre site internet"
+    url: "https://votre-site.fr"
+    click-message: "&f&l✔ &fClique ici pour ouvrir notre &f&lSite Web&f !"
+
+  discord:
+    enabled: true
+    slot: 2
+    material: HEART_OF_THE_SEA
+    name: "&9&lDiscord"
+    lore:
+      - "&7Clique-droit pour rejoindre"
+      - "&7notre serveur Discord"
+    url: "https://discord.gg/votre-invite"
+    click-message: "&9&l✔ &fClique ici pour rejoindre notre &9&lDiscord&f !"
+
+  friends:
+    enabled: true
+    slot: 3
+    material: PLAYER_HEAD
+    name: "&d&lAmis"
+    lore:
+      - "&7Clique-droit pour ouvrir"
+      - "&7le menu des amis"
+    command: "friend gui"
+    actionbar-message: "&d✔ &fMenu Amis ouvert !"
+    sound: "UI_BUTTON_CLICK"

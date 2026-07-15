@@ -10,6 +10,19 @@ restored-message: "&6[CompassHotbar] &aVos items ont été restaurés dans votre
 drop-blocked-message: "&6[CompassHotbar] &cVous ne pouvez pas lâcher cet item!"
 
 # ============================================================
+# Mode global (prioritaire sur la zone)
+# ============================================================
+# Si "true", la hotbar s'affiche PARTOUT sur le serveur, même si une zone
+# "lobby" est configurée et activée ci-dessous : la restriction de zone est
+# alors totalement ignorée (sans effacer sa configuration).
+#
+# Changeable à chaud avec (permission compasshotbar.command requise) :
+#   /compasshotbar global on      -> hotbar partout, zone ignorée
+#   /compasshotbar global off     -> la restriction de zone (si activée) s'applique de nouveau
+#   /compasshotbar global status  -> affiche l'état actuel
+global-mode: false
+
+# ============================================================
 # Zone "lobby" (facultatif)
 # ============================================================
 # Si "enabled: true", les items de la hotbar ne s'affichent QUE lorsque le
@@ -28,6 +41,9 @@ drop-blocked-message: "&6[CompassHotbar] &cVous ne pouvez pas lâcher cet item!"
 #
 # Ces valeurs sont normalement gérées automatiquement par les commandes
 # ci-dessus, mais peuvent aussi être éditées ici directement.
+#
+# Note : si "global-mode: true" (voir plus haut), cette restriction de zone
+# est ignorée, même si "zone.enabled: true".
 zone:
   enabled: false
   world: null

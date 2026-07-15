@@ -52,7 +52,7 @@ public class PlayerListener implements Listener {
         if (!player.hasPermission("compasshotbar.use")) return;
 
         ZoneManager zone = plugin.getZoneManager();
-        if (!zone.isEnabled() || !zone.isConfigured()) return;
+        if (!zone.isRestrictionActive()) return;
 
         Location from = event.getFrom();
         Location to = event.getTo();

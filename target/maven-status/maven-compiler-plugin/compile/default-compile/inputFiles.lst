@@ -1,4 +1,8 @@
-/workspace/project/Keep-Compass-for-ChestCommand/src/main/java/com/compasshotbar/CompassCommand.java
-/workspace/project/Keep-Compass-for-ChestCommand/src/main/java/com/compasshotbar/CompassHotbar.java
-/workspace/project/Keep-Compass-for-ChestCommand/src/main/java/com/compasshotbar/CompassTabCompleter.java
-/workspace/project/Keep-Compass-for-ChestCommand/src/main/java/com/compasshotbar/PlayerListener.java
+/workspace/Keep-Compass-for-ChestCommand/src/main/java/com/compasshotbar/ActionHandler.java
+/workspace/Keep-Compass-for-ChestCommand/src/main/java/com/compasshotbar/CompassCommand.java
+/workspace/Keep-Compass-for-ChestCommand/src/main/java/com/compasshotbar/CompassHotbar.java
+/workspace/Keep-Compass-for-ChestCommand/src/main/java/com/compasshotbar/CompassTabCompleter.java
+/workspace/Keep-Compass-for-ChestCommand/src/main/java/com/compasshotbar/HotbarItem.java
+/workspace/Keep-Compass-for-ChestCommand/src/main/java/com/compasshotbar/HotbarManager.java
+/workspace/Keep-Compass-for-ChestCommand/src/main/java/com/compasshotbar/PlayerListener.java
+/workspace/Keep-Compass-for-ChestCommand/src/main/java/com/compasshotbar/ZoneManager.java

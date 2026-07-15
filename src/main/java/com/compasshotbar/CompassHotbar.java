@@ -79,7 +79,7 @@ public class CompassHotbar extends JavaPlugin {
             return;
         }
 
-        if (zoneManager.isEnabled() && zoneManager.isConfigured()) {
+        if (zoneManager.isRestrictionActive()) {
             if (zoneManager.contains(player.getLocation())) {
                 hotbarManager.giveAll(player);
             } else {
