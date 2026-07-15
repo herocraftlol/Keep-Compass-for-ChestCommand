@@ -24,19 +24,12 @@ public class CompassTabCompleter implements TabCompleter {
                 completions.add("pos1");
                 completions.add("pos2");
                 completions.add("zone");
-                completions.add("global");
             }
         } else if (args.length == 2 && args[0].equalsIgnoreCase("zone")) {
             if (sender.hasPermission("compasshotbar.command")) {
                 completions.add("enable");
                 completions.add("disable");
                 completions.add("info");
-            }
-        } else if (args.length == 2 && args[0].equalsIgnoreCase("global")) {
-            if (sender.hasPermission("compasshotbar.command")) {
-                completions.add("on");
-                completions.add("off");
-                completions.add("status");
             }
         }
 

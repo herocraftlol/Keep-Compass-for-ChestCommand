@@ -7,7 +7,7 @@ author: Developer
 commands:
   compasshotbar:
     description: Toggle compass hotbar feature
-    usage: /compasshotbar [reload|give|toggle|status|pos1|pos2|zone|global]
+    usage: /compasshotbar [reload|give|toggle|status|pos1|pos2|zone]
   compasshotbar reload:
     description: Reload the config
     usage: /compasshotbar reload
@@ -20,9 +20,6 @@ commands:
   compasshotbar zone:
     description: Enable/disable/inspect the lobby zone restriction
     usage: /compasshotbar zone <enable|disable|info>
-  compasshotbar global:
-    description: Force the hotbar to show everywhere on the server, ignoring the zone restriction
-    usage: /compasshotbar global <on|off|status>
 permissions:
   compasshotbar.use:
     description: Allows the player to use the compass hotbar feature

@@ -169,50 +169,8 @@ public class CompassCommand implements CommandExecutor, TabCompleter {
                 }
                 break;
 
-            case "global":
-                if (!sender.hasPermission("compasshotbar.command")) {
-                    sender.sendMessage("§cVous n'avez pas la permission d'utiliser cette commande.");
-                    return true;
-                }
-                if (args.length < 2) {
-                    String currentGlobal = plugin.getZoneManager().isGlobalMode() ? "§aactivé" : "§cdésactivé";
-                    sender.sendMessage("§6[CompassHotbar] §cUsage: /compasshotbar global <on|off|status>");
-                    sender.sendMessage("§6[CompassHotbar] §7Mode global actuel: " + currentGlobal);
-                    return true;
-                }
-
-                switch (args[1].toLowerCase()) {
-                    case "on":
-                    case "enable":
-                        plugin.getZoneManager().setGlobalMode(true);
-                        sender.sendMessage("§6[CompassHotbar] §aMode global activé ! La hotbar s'affiche maintenant partout sur le serveur, quelle que soit la zone configurée.");
-                        for (Player p : plugin.getServer().getOnlinePlayers()) {
-                            plugin.syncZoneState(p);
-                        }
-                        break;
-
-                    case "off":
-                    case "disable":
-                        plugin.getZoneManager().setGlobalMode(false);
-                        sender.sendMessage("§6[CompassHotbar] §7Mode global désactivé. La restriction de zone (si activée) s'applique de nouveau.");
-                        for (Player p : plugin.getServer().getOnlinePlayers()) {
-                            plugin.syncZoneState(p);
-                        }
-                        break;
-
-                    case "status":
-                        String globalStatus = plugin.getZoneManager().isGlobalMode() ? "§aactivé" : "§cdésactivé";
-                        sender.sendMessage("§6[CompassHotbar] §7Mode global: " + globalStatus);
-                        break;
-
-                    default:
-                        sender.sendMessage("§6[CompassHotbar] §cUsage: /compasshotbar global <on|off|status>");
-                        break;
-                }
-                break;
-
             default:
-                sender.sendMessage("§6[CompassHotbar] §cUsage: /compasshotbar [reload|give|toggle|status|pos1|pos2|zone|global]");
+                sender.sendMessage("§6[CompassHotbar] §cUsage: /compasshotbar [reload|give|toggle|status|pos1|pos2|zone]");
                 break;
         }
 
@@ -233,19 +191,12 @@ public class CompassCommand implements CommandExecutor, TabCompleter {
                 completions.add("pos1");
                 completions.add("pos2");
                 completions.add("zone");
-                completions.add("global");
             }
         } else if (args.length == 2 && args[0].equalsIgnoreCase("zone")) {
             if (sender.hasPermission("compasshotbar.command")) {
                 completions.add("enable");
                 completions.add("disable");
                 completions.add("info");
-            }
-        } else if (args.length == 2 && args[0].equalsIgnoreCase("global")) {
-            if (sender.hasPermission("compasshotbar.command")) {
-                completions.add("on");
-                completions.add("off");
-                completions.add("status");
             }
         }
 

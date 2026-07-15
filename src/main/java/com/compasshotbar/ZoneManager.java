@@ -21,16 +21,6 @@ public class ZoneManager {
     private Integer x1, y1, z1;
     private Integer x2, y2, z2;
 
-    /**
-     * Mode "global" : quand activé, la restriction de zone est totalement
-     * ignorée et la hotbar s'affiche partout sur le serveur, même si une
-     * zone est configurée et activée. Ne modifie pas la configuration de la
-     * zone (pos1/pos2/enabled) : c'est un simple interrupteur prioritaire,
-     * changeable à tout moment via une commande admin
-     * (/compasshotbar global on|off).
-     */
-    private boolean globalMode;
-
     public ZoneManager(CompassHotbar plugin) {
         this.plugin = plugin;
         load();
@@ -40,8 +30,6 @@ public class ZoneManager {
      * (Re)lit la section "zone" de la config.yml.
      */
     public void load() {
-        globalMode = plugin.getConfig().getBoolean("global-mode", false);
-
         ConfigurationSection section = plugin.getConfig().getConfigurationSection("zone");
 
         if (section == null) {
@@ -73,7 +61,6 @@ public class ZoneManager {
      * Sauvegarde l'état actuel de la zone dans la config.yml.
      */
     public void save() {
-        plugin.getConfig().set("global-mode", globalMode);
         plugin.getConfig().set("zone.enabled", enabled);
         plugin.getConfig().set("zone.world", worldName);
 
@@ -98,24 +85,6 @@ public class ZoneManager {
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
         save();
-    }
-
-    public boolean isGlobalMode() {
-        return globalMode;
-    }
-
-    public void setGlobalMode(boolean globalMode) {
-        this.globalMode = globalMode;
-        save();
-    }
-
-    /**
-     * True si la restriction de zone doit réellement s'appliquer, c'est-à-dire
-     * si la zone est activée et configurée ET que le mode global (qui a
-     * priorité sur tout) n'est pas actif.
-     */
-    public boolean isRestrictionActive() {
-        return !globalMode && enabled && isConfigured();
     }
 
     /**
@@ -171,9 +140,6 @@ public class ZoneManager {
      */
     public List<String> getInfoLines() {
         List<String> lines = new ArrayList<>();
-
-        lines.add(HotbarManager.colorize("&6[CompassHotbar] &7Mode global : "
-                + (globalMode ? "&aactivé &7(hotbar partout, zone ignorée)" : "&cdésactivé")));
 
         if (!isConfigured()) {
             lines.add(HotbarManager.colorize("&cZone non configurée."));

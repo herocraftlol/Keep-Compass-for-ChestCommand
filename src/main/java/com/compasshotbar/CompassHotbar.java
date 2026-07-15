@@ -69,9 +69,9 @@ public class CompassHotbar extends JavaPlugin {
     }
 
     /**
-     * Donne ou retire les items d'un joueur selon l'état du plugin et,
-     * si elle est activée, selon sa position par rapport à la zone
-     * définie par /compasshotbar pos1 et pos2 (zone "lobby").
+     * Donne ou retire les items d'un joueur selon l'état du plugin. La
+     * logique "quel item afficher selon la zone" est gérée item par item
+     * dans HotbarManager (voir HotbarItem#isShowOutsideZone).
      */
     public void syncZoneState(Player player) {
         if (!enabled) {
@@ -79,15 +79,7 @@ public class CompassHotbar extends JavaPlugin {
             return;
         }
 
-        if (zoneManager.isRestrictionActive()) {
-            if (zoneManager.contains(player.getLocation())) {
-                hotbarManager.giveAll(player);
-            } else {
-                hotbarManager.removeAll(player);
-            }
-        } else {
-            hotbarManager.giveAll(player);
-        }
+        hotbarManager.giveAll(player);
     }
 
     /**

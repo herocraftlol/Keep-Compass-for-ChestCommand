@@ -10,25 +10,17 @@ restored-message: "&6[CompassHotbar] &aVos items ont été restaurés dans votre
 drop-blocked-message: "&6[CompassHotbar] &cVous ne pouvez pas lâcher cet item!"
 
 # ============================================================
-# Mode global (prioritaire sur la zone)
-# ============================================================
-# Si "true", la hotbar s'affiche PARTOUT sur le serveur, même si une zone
-# "lobby" est configurée et activée ci-dessous : la restriction de zone est
-# alors totalement ignorée (sans effacer sa configuration).
-#
-# Changeable à chaud avec (permission compasshotbar.command requise) :
-#   /compasshotbar global on      -> hotbar partout, zone ignorée
-#   /compasshotbar global off     -> la restriction de zone (si activée) s'applique de nouveau
-#   /compasshotbar global status  -> affiche l'état actuel
-global-mode: false
-
-# ============================================================
 # Zone "lobby" (facultatif)
 # ============================================================
-# Si "enabled: true", les items de la hotbar ne s'affichent QUE lorsque le
-# joueur se trouve à l'intérieur de la zone définie par pos1/pos2 (bornes
-# incluses). Dès qu'il en sort, tous les items du plugin sont retirés de sa
-# hotbar ; ils réapparaissent automatiquement quand il y revient.
+# Si "enabled: true", chaque item de la hotbar suit la règle suivante :
+#   - à l'intérieur de la zone définie par pos1/pos2 (bornes incluses) :
+#     tous les items activés s'affichent normalement.
+#   - à l'extérieur de la zone : seuls les items ayant
+#     "show-outside-zone: true" restent affichés (voir plus bas, section
+#     hotbar-items). Par défaut, seule la boussole a cette option activée :
+#     hors zone, tous les items cliquables (boutique, site, discord, amis...)
+#     disparaissent, et reviennent automatiquement dès que le joueur rentre
+#     dans la zone.
 #
 # Pour définir la zone en jeu (permission compasshotbar.command requise) :
 #   1. Regardez le premier bloc de coin de la zone, puis /compasshotbar pos1
@@ -41,9 +33,6 @@ global-mode: false
 #
 # Ces valeurs sont normalement gérées automatiquement par les commandes
 # ci-dessus, mais peuvent aussi être éditées ici directement.
-#
-# Note : si "global-mode: true" (voir plus haut), cette restriction de zone
-# est ignorée, même si "zone.enabled: true".
 zone:
   enabled: false
   world: null
@@ -82,12 +71,21 @@ zone:
 #                 UI_BUTTON_CLICK, BLOCK_NOTE_BLOCK_PLING...). Par défaut :
 #                 ENTITY_EXPERIENCE_ORB_PICKUP pour les liens, UI_BUTTON_CLICK
 #                 pour les commandes.
+# - show-outside-zone : (optionnel, false par défaut) si la zone "lobby"
+#                 ci-dessus est activée, détermine si CET item précis reste
+#                 affiché quand le joueur est hors zone. La boussole l'a à
+#                 "true" par défaut : elle reste utilisable partout. Les
+#                 autres items (boutique, site, discord, amis...) restent à
+#                 "false" : ils ne s'affichent que dans la zone. Si la zone
+#                 n'est pas activée, cette option n'a aucun effet (tous les
+#                 items s'affichent partout, comme avant).
 hotbar-items:
 
   compass:
     enabled: true
     slot: 8
     material: COMPASS
+    show-outside-zone: true
 
   shop:
     enabled: true
@@ -101,6 +99,7 @@ hotbar-items:
     click-message: "&a&l✔ &fClique ici pour ouvrir la &a&lBoutique&f !"
     actionbar-message: "&e➤ &fClique sur le lien dans le chat pour ouvrir la boutique !"
     sound: "ENTITY_EXPERIENCE_ORB_PICKUP"
+    show-outside-zone: false
 
   website:
     enabled: true
@@ -112,6 +111,7 @@ hotbar-items:
       - "&7notre site internet"
     url: "https://votre-site.fr"
     click-message: "&f&l✔ &fClique ici pour ouvrir notre &f&lSite Web&f !"
+    show-outside-zone: false
 
   discord:
     enabled: true
@@ -123,6 +123,7 @@ hotbar-items:
       - "&7notre serveur Discord"
     url: "https://discord.gg/votre-invite"
     click-message: "&9&l✔ &fClique ici pour rejoindre notre &9&lDiscord&f !"
+    show-outside-zone: false
 
   friends:
     enabled: true
@@ -135,3 +136,4 @@ hotbar-items:
     command: "friend gui"
     actionbar-message: "&d✔ &fMenu Amis ouvert !"
     sound: "UI_BUTTON_CLICK"
+    show-outside-zone: false

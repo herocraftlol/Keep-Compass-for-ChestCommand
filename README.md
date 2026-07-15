@@ -25,6 +25,8 @@ et un accès au menu amis.
   de zone et d'afficher la hotbar partout sur le serveur, sans modifier la configuration
   de la zone. Utilisez `/compasshotbar global on` pour activer et `/compasshotbar global off`
   pour revenir au comportement normal
+- **Items avec paramètres de zone individuels** : chaque item peut être configuré pour
+  s'afficher ou non en dehors de la zone définie via le paramètre `showOutsideZone`
 - **Commandes admin** : activez/désactivez le plugin avec `/compasshotbar`
 
 ## 🎒 Items fournis par défaut
@@ -106,4 +108,4 @@ Chaque item accepte : `enabled`, `slot` (0-8), `material`, `name`, `lore`, et **
 mvn clean package
 ```
 
-Le JAR sera dans `target/CompassHotbar-1.3.0.jar`.
+Le JAR sera dans `target/CompassHotbar-1.4.0.jar`.
