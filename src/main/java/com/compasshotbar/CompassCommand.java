@@ -1,5 +1,6 @@
 package com.compasshotbar;
 
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -87,8 +88,89 @@ public class CompassCommand implements CommandExecutor, TabCompleter {
                 sender.sendMessage("§6[CompassHotbar] §7Statut du plugin: " + status);
                 break;
 
+            case "pos1":
+                if (!sender.hasPermission("compasshotbar.command")) {
+                    sender.sendMessage("§cVous n'avez pas la permission d'utiliser cette commande.");
+                    return true;
+                }
+                if (!(sender instanceof Player player1)) {
+                    sender.sendMessage("§cCette commande ne peut être utilisée que par un joueur.");
+                    return true;
+                }
+                Block target1 = player1.getTargetBlockExact(10);
+                if (target1 == null) {
+                    sender.sendMessage("§6[CompassHotbar] §cAucun bloc visé dans la portée (10 blocs).");
+                    return true;
+                }
+                plugin.getZoneManager().setPos1(target1.getLocation());
+                sender.sendMessage("§6[CompassHotbar] §aPos1 définie : §f" + target1.getX() + ", "
+                        + target1.getY() + ", " + target1.getZ() + " §7(" + target1.getWorld().getName() + ")");
+                break;
+
+            case "pos2":
+                if (!sender.hasPermission("compasshotbar.command")) {
+                    sender.sendMessage("§cVous n'avez pas la permission d'utiliser cette commande.");
+                    return true;
+                }
+                if (!(sender instanceof Player player2)) {
+                    sender.sendMessage("§cCette commande ne peut être utilisée que par un joueur.");
+                    return true;
+                }
+                Block target2 = player2.getTargetBlockExact(10);
+                if (target2 == null) {
+                    sender.sendMessage("§6[CompassHotbar] §cAucun bloc visé dans la portée (10 blocs).");
+                    return true;
+                }
+                plugin.getZoneManager().setPos2(target2.getLocation());
+                sender.sendMessage("§6[CompassHotbar] §aPos2 définie : §f" + target2.getX() + ", "
+                        + target2.getY() + ", " + target2.getZ() + " §7(" + target2.getWorld().getName() + ")");
+                break;
+
+            case "zone":
+                if (!sender.hasPermission("compasshotbar.command")) {
+                    sender.sendMessage("§cVous n'avez pas la permission d'utiliser cette commande.");
+                    return true;
+                }
+                if (args.length < 2) {
+                    sender.sendMessage("§6[CompassHotbar] §cUsage: /compasshotbar zone <enable|disable|info>");
+                    return true;
+                }
+
+                switch (args[1].toLowerCase()) {
+                    case "enable":
+                        if (!plugin.getZoneManager().isConfigured()) {
+                            sender.sendMessage("§6[CompassHotbar] §cDéfinissez d'abord pos1 et pos2 avant d'activer la zone.");
+                        } else {
+                            plugin.getZoneManager().setEnabled(true);
+                            sender.sendMessage("§6[CompassHotbar] §aRestriction de zone activée ! La hotbar ne s'affichera que dans la zone définie.");
+                            for (Player p : plugin.getServer().getOnlinePlayers()) {
+                                plugin.syncZoneState(p);
+                            }
+                        }
+                        break;
+
+                    case "disable":
+                        plugin.getZoneManager().setEnabled(false);
+                        sender.sendMessage("§6[CompassHotbar] §7Restriction de zone désactivée. La hotbar s'affiche partout.");
+                        for (Player p : plugin.getServer().getOnlinePlayers()) {
+                            plugin.syncZoneState(p);
+                        }
+                        break;
+
+                    case "info":
+                        for (String line : plugin.getZoneManager().getInfoLines()) {
+                            sender.sendMessage(line);
+                        }
+                        break;
+
+                    default:
+                        sender.sendMessage("§6[CompassHotbar] §cUsage: /compasshotbar zone <enable|disable|info>");
+                        break;
+                }
+                break;
+
             default:
-                sender.sendMessage("§6[CompassHotbar] §cUsage: /compasshotbar [reload|give|toggle|status]");
+                sender.sendMessage("§6[CompassHotbar] §cUsage: /compasshotbar [reload|give|toggle|status|pos1|pos2|zone]");
                 break;
         }
 
@@ -106,6 +188,15 @@ public class CompassCommand implements CommandExecutor, TabCompleter {
                 completions.add("give");
                 completions.add("toggle");
                 completions.add("status");
+                completions.add("pos1");
+                completions.add("pos2");
+                completions.add("zone");
+            }
+        } else if (args.length == 2 && args[0].equalsIgnoreCase("zone")) {
+            if (sender.hasPermission("compasshotbar.command")) {
+                completions.add("enable");
+                completions.add("disable");
+                completions.add("info");
             }
         }
 

@@ -6,11 +6,11 @@
 
     <groupId>com.compasshotbar</groupId>
     <artifactId>CompassHotbar</artifactId>
-    <version>1.1.0</version>
+    <version>1.4.0</version>
     <packaging>jar</packaging>
 
     <name>CompassHotbar</name>
-    <description>Keep fixed clickable items (compass, shop, website, discord, friends...) in the hotbar</description>
+    <description>Keep fixed clickable items (compass, shop, website, discord, friends...) in the hotbar, with zone restriction, global mode, and per-item zone settings</description>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

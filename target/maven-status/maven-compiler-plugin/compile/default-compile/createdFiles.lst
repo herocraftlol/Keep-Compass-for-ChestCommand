@@ -1,4 +1,10 @@
 com/compasshotbar/CompassCommand.class
+com/compasshotbar/ActionHandler$1.class
+com/compasshotbar/ActionHandler.class
+com/compasshotbar/ZoneManager.class
+com/compasshotbar/HotbarItem$ActionType.class
 com/compasshotbar/CompassHotbar.class
 com/compasshotbar/CompassTabCompleter.class
+com/compasshotbar/HotbarManager.class
+com/compasshotbar/HotbarItem.class
 com/compasshotbar/PlayerListener.class

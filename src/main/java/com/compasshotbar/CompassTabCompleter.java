@@ -21,6 +21,15 @@ public class CompassTabCompleter implements TabCompleter {
                 completions.add("give");
                 completions.add("toggle");
                 completions.add("status");
+                completions.add("pos1");
+                completions.add("pos2");
+                completions.add("zone");
+            }
+        } else if (args.length == 2 && args[0].equalsIgnoreCase("zone")) {
+            if (sender.hasPermission("compasshotbar.command")) {
+                completions.add("enable");
+                completions.add("disable");
+                completions.add("info");
             }
         }
 

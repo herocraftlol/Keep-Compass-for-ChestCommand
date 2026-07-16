@@ -28,10 +28,11 @@ public class HotbarItem {
     private final String clickMessage;
     private final String actionbarMessage;
     private final String soundName;
+    private final boolean showOutsideZone;
 
     public HotbarItem(String id, boolean enabled, int slot, Material material, String displayName,
                        List<String> lore, ActionType actionType, String actionValue, String clickMessage,
-                       String actionbarMessage, String soundName) {
+                       String actionbarMessage, String soundName, boolean showOutsideZone) {
         this.id = id;
         this.enabled = enabled;
         this.slot = slot;
@@ -43,6 +44,7 @@ public class HotbarItem {
         this.clickMessage = clickMessage;
         this.actionbarMessage = actionbarMessage;
         this.soundName = soundName;
+        this.showOutsideZone = showOutsideZone;
     }
 
     public String getId() {
@@ -87,5 +89,14 @@ public class HotbarItem {
 
     public String getSoundName() {
         return soundName;
+    }
+
+    /**
+     * True si cet item doit rester visible même quand le joueur est en
+     * dehors de la zone lobby (ex: la boussole). False par défaut : l'item
+     * disparaît hors zone, comme les items cliquables (boutique, discord...).
+     */
+    public boolean isShowOutsideZone() {
+        return showOutsideZone;
     }
 }

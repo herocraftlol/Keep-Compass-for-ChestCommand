@@ -8,6 +8,7 @@ public class CompassHotbar extends JavaPlugin {
     private static CompassHotbar instance;
     private boolean enabled = true;
     private HotbarManager hotbarManager;
+    private ZoneManager zoneManager;
 
     @Override
     public void onEnable() {
@@ -16,6 +17,7 @@ public class CompassHotbar extends JavaPlugin {
         enabled = getConfig().getBoolean("enabled", true);
 
         hotbarManager = new HotbarManager(this);
+        zoneManager = new ZoneManager(this);
 
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 
@@ -23,7 +25,7 @@ public class CompassHotbar extends JavaPlugin {
         getCommand("compasshotbar").setTabCompleter(new CompassTabCompleter());
 
         for (Player player : getServer().getOnlinePlayers()) {
-            hotbarManager.giveAll(player);
+            syncZoneState(player);
         }
 
         getLogger().info("CompassHotbar has been enabled!");
@@ -42,6 +44,10 @@ public class CompassHotbar extends JavaPlugin {
         return hotbarManager;
     }
 
+    public ZoneManager getZoneManager() {
+        return zoneManager;
+    }
+
     public boolean isPluginEnabled() {
         return enabled;
     }
@@ -57,9 +63,23 @@ public class CompassHotbar extends JavaPlugin {
             }
         } else {
             for (Player player : getServer().getOnlinePlayers()) {
-                hotbarManager.giveAll(player);
+                syncZoneState(player);
             }
         }
+    }
+
+    /**
+     * Donne ou retire les items d'un joueur selon l'état du plugin. La
+     * logique "quel item afficher selon la zone" est gérée item par item
+     * dans HotbarManager (voir HotbarItem#isShowOutsideZone).
+     */
+    public void syncZoneState(Player player) {
+        if (!enabled) {
+            hotbarManager.removeAll(player);
+            return;
+        }
+
+        hotbarManager.giveAll(player);
     }
 
     /**
@@ -88,5 +108,10 @@ public class CompassHotbar extends JavaPlugin {
     public void reloadHotbarConfig() {
         reloadConfig();
         hotbarManager.reload();
+        zoneManager.load();
+
+        for (Player player : getServer().getOnlinePlayers()) {
+            syncZoneState(player);
+        }
     }
 }

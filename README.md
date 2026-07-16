@@ -18,6 +18,15 @@ et un accès au menu amis.
   - **Commande** : exécute une commande en tant que joueur (ex: `/friend gui`)
 - **100% configurable** : slots, matériaux, noms, lores, liens et commandes se
   règlent dans `config.yml`, sans recompiler le plugin
+- **Zone de restriction (optionnelle)** : les items ne s'affichent que dans une zone
+  définie (par exemple un lobby). Définissez la zone avec `/compasshotbar pos1` et
+  `/compasshotbar pos2`, puis activez avec `/compasshotbar zone enable`
+- **Mode global (prioritaire)** : permet de désactiver temporairement la restriction
+  de zone et d'afficher la hotbar partout sur le serveur, sans modifier la configuration
+  de la zone. Utilisez `/compasshotbar global on` pour activer et `/compasshotbar global off`
+  pour revenir au comportement normal
+- **Items avec paramètres de zone individuels** : chaque item peut être configuré pour
+  s'afficher ou non en dehors de la zone définie via le paramètre `showOutsideZone`
 - **Commandes admin** : activez/désactivez le plugin avec `/compasshotbar`
 
 ## 🎒 Items fournis par défaut
@@ -42,6 +51,14 @@ des 9 slots de la hotbar) directement dans `config.yml`.
 | /compasshotbar give | Redonne tous les items à tous les joueurs |
 | /compasshotbar toggle | Alias pour activer/désactiver |
 | /compasshotbar status | Affiche le statut du plugin |
+| /compasshotbar pos1 | Définit le premier coin de la zone (bloc visé) |
+| /compasshotbar pos2 | Définit le second coin de la zone (bloc visé) |
+| /compasshotbar zone enable | Active la restriction de zone |
+| /compasshotbar zone disable | Désactive la restriction de zone |
+| /compasshotbar zone info | Affiche les infos de la zone définie |
+| /compasshotbar global on | Active le mode global (hotbar partout) |
+| /compasshotbar global off | Désactive le mode global |
+| /compasshotbar global status | Affiche l'état du mode global |
 
 ## 📦 Installation
 
@@ -91,4 +108,4 @@ Chaque item accepte : `enabled`, `slot` (0-8), `material`, `name`, `lore`, et **
 mvn clean package
 ```
 
-Le JAR sera dans `target/CompassHotbar-1.1.0.jar`.
+Le JAR sera dans `target/CompassHotbar-1.4.0.jar`.

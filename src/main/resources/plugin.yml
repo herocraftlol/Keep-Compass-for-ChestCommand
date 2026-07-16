@@ -7,10 +7,19 @@ author: Developer
 commands:
   compasshotbar:
     description: Toggle compass hotbar feature
-    usage: /compasshotbar
+    usage: /compasshotbar [reload|give|toggle|status|pos1|pos2|zone]
   compasshotbar reload:
     description: Reload the config
     usage: /compasshotbar reload
+  compasshotbar pos1:
+    description: Set the first corner of the lobby zone (block you are looking at)
+    usage: /compasshotbar pos1
+  compasshotbar pos2:
+    description: Set the second corner of the lobby zone (block you are looking at)
+    usage: /compasshotbar pos2
+  compasshotbar zone:
+    description: Enable/disable/inspect the lobby zone restriction
+    usage: /compasshotbar zone <enable|disable|info>
 permissions:
   compasshotbar.use:
     description: Allows the player to use the compass hotbar feature
