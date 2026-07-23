@@ -28,10 +28,12 @@ public class HotbarItem {
     private final String clickMessage;
     private final String actionbarMessage;
     private final String soundName;
+    private final boolean showOutsideZone;
+    private final boolean opensGui;
 
     public HotbarItem(String id, boolean enabled, int slot, Material material, String displayName,
                        List<String> lore, ActionType actionType, String actionValue, String clickMessage,
-                       String actionbarMessage, String soundName) {
+                       String actionbarMessage, String soundName, boolean showOutsideZone, boolean opensGui) {
         this.id = id;
         this.enabled = enabled;
         this.slot = slot;
@@ -43,6 +45,8 @@ public class HotbarItem {
         this.clickMessage = clickMessage;
         this.actionbarMessage = actionbarMessage;
         this.soundName = soundName;
+        this.showOutsideZone = showOutsideZone;
+        this.opensGui = opensGui;
     }
 
     public String getId() {
@@ -87,5 +91,24 @@ public class HotbarItem {
 
     public String getSoundName() {
         return soundName;
+    }
+
+    /**
+     * True si cet item doit rester visible même quand le joueur est en
+     * dehors de la zone lobby (ex: la boussole). False par défaut : l'item
+     * disparaît hors zone, comme les items cliquables (boutique, discord...).
+     */
+    public boolean isShowOutsideZone() {
+        return showOutsideZone;
+    }
+
+    /**
+     * True si un clic-droit sur cet item doit ouvrir le menu
+     * Serveurs/Mini-jeux (ServerGuiManager) au lieu (ou en plus) de son
+     * action normale (url/commande/rien). Utilisé typiquement par l'item
+     * "compass".
+     */
+    public boolean isOpensGui() {
+        return opensGui;
     }
 }

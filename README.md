@@ -18,7 +18,20 @@ et un accès au menu amis.
   - **Commande** : exécute une commande en tant que joueur (ex: `/friend gui`)
 - **100% configurable** : slots, matériaux, noms, lores, liens et commandes se
   règlent dans `config.yml`, sans recompiler le plugin
+- **Zone de restriction (optionnelle)** : les items ne s'affichent que dans une zone
+  définie (par exemple un lobby). Définissez la zone avec `/compasshotbar pos1` et
+  `/compasshotbar pos2`, puis activez avec `/compasshotbar zone enable`
+- **Mode global (prioritaire)** : permet de désactiver temporairement la restriction
+  de zone et d'afficher la hotbar partout sur le serveur, sans modifier la configuration
+  de la zone. Utilisez `/compasshotbar global on` pour activer et `/compasshotbar global off`
+  pour revenir au comportement normal
+- **Items avec paramètres de zone individuels** : chaque item peut être configuré pour
+  s'afficher ou non en dehors de la zone définie via le paramètre `showOutsideZone`
 - **Commandes admin** : activez/désactivez le plugin avec `/compasshotbar`
+- **Menu "Serveurs & Mini-jeux" sur la boussole** : menu personnalisable
+  (icônes, noms, lores) listant les serveurs du réseau avec leur statut
+  ouvert/fermé et leur nombre de joueurs en direct, compatible Velocity
+  (voir section dédiée plus bas)
 
 ## 🎒 Items fournis par défaut
 
@@ -42,6 +55,14 @@ des 9 slots de la hotbar) directement dans `config.yml`.
 | /compasshotbar give | Redonne tous les items à tous les joueurs |
 | /compasshotbar toggle | Alias pour activer/désactiver |
 | /compasshotbar status | Affiche le statut du plugin |
+| /compasshotbar pos1 | Définit le premier coin de la zone (bloc visé) |
+| /compasshotbar pos2 | Définit le second coin de la zone (bloc visé) |
+| /compasshotbar zone enable | Active la restriction de zone |
+| /compasshotbar zone disable | Désactive la restriction de zone |
+| /compasshotbar zone info | Affiche les infos de la zone définie |
+| /compasshotbar global on | Active le mode global (hotbar partout) |
+| /compasshotbar global off | Désactive le mode global |
+| /compasshotbar global status | Affiche l'état du mode global |
 
 ## 📦 Installation
 
@@ -50,6 +71,9 @@ des 9 slots de la hotbar) directement dans `config.yml`.
 3. Démarrez le serveur une première fois pour générer `plugins/CompassHotbar/config.yml`
 4. Éditez ce fichier pour renseigner vos vrais liens (boutique, site, Discord)
 5. `/compasshotbar reload`
+6. *(Optionnel mais recommandé)* Compilez et installez aussi
+   `CompassHotbarVelocity` sur votre **proxy** pour que le menu affiche les
+   vrais statuts/joueurs (voir section "Menu Serveurs & Mini-jeux" plus bas)
 
 ## 📋 Permissions
 
@@ -85,10 +109,78 @@ hotbar-items:
 Chaque item accepte : `enabled`, `slot` (0-8), `material`, `name`, `lore`, et **soit**
 `url` **soit** `command` (pas les deux) pour définir son action au clic droit.
 
+## 🧭 Menu "Serveurs & Mini-jeux" (clic sur la boussole)
+
+Depuis la 1.5.0, la boussole peut ouvrir un menu (inventaire) entièrement
+personnalisable listant les serveurs/mini-jeux de votre réseau, avec pour
+chacun :
+
+- une icône (matériau) et un nom personnalisables,
+- son statut en direct : **ouvert** (répond au ping) ou **fermé**,
+- son nombre de joueurs en direct (`{online}/{max}`),
+- un effet "brillant" optionnel quand il est ouvert,
+- un clic dessus transfère le joueur vers ce serveur via le proxy.
+
+Tout se règle dans la section `servers-gui` de `config.yml` : titre, nombre
+de lignes, matériau de remplissage, textes (avec les placeholders `{online}`
+et `{max}`), et la liste des icônes (`items`), chacune avec son `slot`, son
+`material`, son `name`, son `extra-lore`, et surtout son champ **`server`**
+qui doit correspondre **exactement** au nom du serveur déclaré dans le
+`velocity.toml` de votre proxy (section `[servers]`).
+
+Pour que la boussole ouvre ce menu au lieu de ne rien faire, l'item
+`compass` a maintenant un champ `opens-gui: true` dans `config.yml`
+(passez-le à `false` pour revenir au comportement vanilla).
+
+### D'où viennent les données de joueurs/statut ?
+
+Un serveur Spigot/Paper seul ne peut pas savoir combien de joueurs sont
+connectés sur *un autre* serveur du réseau : cette info doit venir du
+proxy. C'est le rôle du petit plugin **CompassHotbarVelocity**, fourni à
+côté de celui-ci (dossier `CompassHotbarVelocity/`) :
+
+1. Compilez-le (`cd CompassHotbarVelocity && mvn clean package`) et placez
+   le JAR obtenu dans `plugins/` de votre **proxy Velocity** (pas sur les
+   serveurs de jeu).
+2. Il ping automatiquement, toutes les 5 secondes, tous les serveurs
+   déclarés dans `velocity.toml`, et pousse le résultat (nom, joueurs,
+   joueurs max, ouvert/fermé) à CompassHotbar sur chaque serveur backend
+   via le canal `compasshotbar:sync`.
+3. Rien à configurer côté Velocity : aucune commande, aucun fichier de
+   config. Un simple log au démarrage confirme qu'il tourne.
+
+**Sans ce plugin sur le proxy**, le menu reste utilisable (les clics
+transfèrent bien les joueurs), mais chaque icône affiche `Chargement...`
+au lieu des vrais chiffres (voir `no-data-lore` dans la config).
+
+Le transfert d'un joueur vers un autre serveur (clic dans le menu), lui,
+**ne nécessite pas** CompassHotbarVelocity : il utilise le canal legacy
+`bungeecord:main` ("Connect"), supporté nativement par Velocity (et
+BungeeCord) sans aucun plugin.
+
+### Compatibilité proxy
+
+Ce système fonctionne aussi bien avec **Velocity** qu'avec **BungeeCord**
+pour la partie transfert de joueurs (canal `bungeecord:main` standard).
+Le ping en temps réel (ouvert/fermé + joueurs) nécessite en revanche le
+plugin `CompassHotbarVelocity`, écrit spécifiquement pour l'API Velocity ;
+sur BungeeCord il faudrait un équivalent utilisant l'API BungeeCord (même
+principe : ping des serveurs + envoi du même format texte sur
+`compasshotbar:sync`).
+
 ## 🔧 Compilation
 
 ```bash
 mvn clean package
 ```
 
-Le JAR sera dans `target/CompassHotbar-1.1.0.jar`.
+Le JAR sera dans `target/CompassHotbar-1.5.0.jar`.
+
+Pour le plugin proxy (facultatif mais recommandé pour les vrais chiffres) :
+
+```bash
+cd CompassHotbarVelocity
+mvn clean package
+```
+
+Le JAR sera dans `CompassHotbarVelocity/target/CompassHotbarVelocity-1.0.0.jar`.

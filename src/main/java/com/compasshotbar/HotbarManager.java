@@ -88,6 +88,8 @@ public class HotbarManager {
             String clickMessage = section.getString("click-message", null);
             String actionbarMessage = section.getString("actionbar-message", null);
             String soundName = section.getString("sound", null);
+            boolean showOutsideZone = section.getBoolean("show-outside-zone", false);
+            boolean opensGui = section.getBoolean("opens-gui", false);
 
             if (slot < 0 || slot > 8) {
                 plugin.getLogger().warning("Slot invalide pour l'item '" + id + "' (" + slot + "), item ignoré.");
@@ -95,7 +97,7 @@ public class HotbarManager {
             }
 
             items.put(id, new HotbarItem(id, enabled, slot, material, displayName, lore, actionType, actionValue,
-                    clickMessage, actionbarMessage, soundName));
+                    clickMessage, actionbarMessage, soundName, showOutsideZone, opensGui));
         }
     }
 
@@ -139,14 +141,41 @@ public class HotbarManager {
         return meta.getPersistentDataContainer().get(itemIdKey, PersistentDataType.STRING);
     }
 
+    /**
+     * True si cet item doit être présent dans la hotbar du joueur en ce
+     * moment : le plugin doit être activé, l'item lui-même activé, et
+     * soit le joueur est dans la zone (ou aucune zone n'est active), soit
+     * l'item est marqué "show-outside-zone: true" (ex: la boussole).
+     */
+    private boolean shouldShowItem(HotbarItem item, Player player) {
+        if (!item.isEnabled()) return false;
+
+        ZoneManager zone = plugin.getZoneManager();
+        if (zone.isEnabled() && zone.isConfigured() && !zone.contains(player.getLocation())) {
+            return item.isShowOutsideZone();
+        }
+        return true;
+    }
+
+    /**
+     * Place chaque item activé dans son slot si les conditions (zone
+     * incluse) sont réunies, et retire ceux qui ne doivent plus apparaître
+     * (ex: un item passant hors zone alors qu'il n'a pas "show-outside-zone").
+     */
     public void giveAll(Player player) {
         if (!plugin.isPluginEnabled()) return;
         if (!player.hasPermission("compasshotbar.use")) return;
 
         PlayerInventory inventory = player.getInventory();
         for (HotbarItem item : items.values()) {
-            if (!item.isEnabled()) continue;
-            inventory.setItem(item.getSlot(), buildItemStack(item));
+            if (shouldShowItem(item, player)) {
+                inventory.setItem(item.getSlot(), buildItemStack(item));
+            } else {
+                ItemStack current = inventory.getItem(item.getSlot());
+                if (item.getId().equals(getItemId(current))) {
+                    inventory.setItem(item.getSlot(), null);
+                }
+            }
         }
     }
 
@@ -172,12 +201,15 @@ public class HotbarManager {
         boolean restoredAny = false;
 
         for (HotbarItem item : items.values()) {
-            if (!item.isEnabled()) continue;
-
             ItemStack current = inventory.getItem(item.getSlot());
-            if (!item.getId().equals(getItemId(current))) {
-                inventory.setItem(item.getSlot(), buildItemStack(item));
-                restoredAny = true;
+
+            if (shouldShowItem(item, player)) {
+                if (!item.getId().equals(getItemId(current))) {
+                    inventory.setItem(item.getSlot(), buildItemStack(item));
+                    restoredAny = true;
+                }
+            } else if (item.getId().equals(getItemId(current))) {
+                inventory.setItem(item.getSlot(), null);
             }
         }
 

@@ -1,5 +1,6 @@
 package com.compasshotbar;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -11,6 +12,7 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.inventory.ItemStack;
@@ -28,18 +30,46 @@ public class PlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        if (plugin.isPluginEnabled()) {
-            plugin.giveAllItems(player);
-        }
+        plugin.syncZoneState(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
+        plugin.syncZoneState(event.getPlayer());
+    }
+
+    /**
+     * Détecte les entrées/sorties de la zone (pos1/pos2) pour donner ou
+     * retirer les items de la hotbar en conséquence. On ne fait le calcul
+     * complet que si le joueur a changé de bloc, pour ne pas surcharger le
+     * serveur (PlayerMoveEvent se déclenche très souvent).
+     */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerMove(PlayerMoveEvent event) {
+        if (!plugin.isPluginEnabled()) return;
+
         Player player = event.getPlayer();
-        if (plugin.isPluginEnabled()) {
-            plugin.giveAllItems(player);
+        if (!player.hasPermission("compasshotbar.use")) return;
+
+        ZoneManager zone = plugin.getZoneManager();
+        if (!zone.isEnabled() || !zone.isConfigured()) return;
+
+        Location from = event.getFrom();
+        Location to = event.getTo();
+        if (to == null) return;
+
+        if (from.getWorld().equals(to.getWorld())
+                && from.getBlockX() == to.getBlockX()
+                && from.getBlockY() == to.getBlockY()
+                && from.getBlockZ() == to.getBlockZ()) {
+            return; // Pas de changement de bloc : rien à vérifier.
         }
+
+        boolean wasIn = zone.contains(from);
+        boolean isIn = zone.contains(to);
+        if (wasIn == isIn) return; // Toujours dans le même état (dedans ou dehors).
+
+        plugin.syncZoneState(player);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -79,6 +109,32 @@ public class PlayerListener implements Listener {
                     "&6[CompassHotbar] &cVous ne pouvez pas lâcher cet item!");
             player.sendMessage(HotbarManager.colorize(message));
         }
+    }
+
+    /**
+     * Gère les clics dans le menu Serveurs/Mini-jeux ouvert par la
+     * boussole : tout clic est annulé (on ne veut pas que le joueur
+     * récupère les icônes), et cliquer sur une icône connectée à un
+     * serveur envoie une demande de transfert via le proxy.
+     */
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
+    public void onServerGuiClick(InventoryClickEvent event) {
+        if (!(event.getInventory().getHolder() instanceof ServerGuiHolder)) return;
+        event.setCancelled(true);
+
+        if (!(event.getWhoClicked() instanceof Player player)) return;
+        if (event.getClickedInventory() != event.getInventory()) return;
+
+        ServerGuiManager guiManager = plugin.getServerGuiManager();
+        String itemId = guiManager.getItemIdOf(event.getCurrentItem());
+        if (itemId == null) return;
+
+        ServerGuiItem item = guiManager.getItem(itemId);
+        if (item == null || item.getTargetServer() == null || item.getTargetServer().isEmpty()) return;
+
+        player.closeInventory();
+        plugin.getProxyBridge().connect(player, item.getTargetServer());
+        player.sendMessage(HotbarManager.colorize("&6[CompassHotbar] &7Connexion à &f" + item.getTargetServer() + "&7..."));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
@@ -156,12 +212,18 @@ public class PlayerListener implements Listener {
         if (event.getAction().name().contains("RIGHT")) {
             // On annule l'interaction par défaut (poser un bloc comme la toile
             // d'araignée, etc.) uniquement pour les items qui ont une action
-            // (URL/commande). La boussole garde son comportement normal.
-            if (hotbarItem.getActionType() != HotbarItem.ActionType.NONE) {
+            // (URL/commande) ou qui ouvrent le menu. La boussole "vanilla"
+            // (sans opens-gui) garde son comportement normal.
+            if (hotbarItem.getActionType() != HotbarItem.ActionType.NONE || hotbarItem.isOpensGui()) {
                 event.setCancelled(true);
             }
             plugin.ensureAllItems(player);
-            ActionHandler.executeFor(player, hotbarItem);
+
+            if (hotbarItem.isOpensGui() && plugin.getServerGuiManager().isEnabled()) {
+                plugin.getServerGuiManager().open(player);
+            } else {
+                ActionHandler.executeFor(player, hotbarItem);
+            }
         }
     }
 
@@ -176,10 +238,8 @@ public class PlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onServerLoad(ServerLoadEvent event) {
-        if (plugin.isPluginEnabled()) {
-            for (Player player : plugin.getServer().getOnlinePlayers()) {
-                plugin.giveAllItems(player);
-            }
+        for (Player player : plugin.getServer().getOnlinePlayers()) {
+            plugin.syncZoneState(player);
         }
     }
 }
