@@ -70,6 +70,19 @@ public class PlayerListener implements Listener {
         if (wasIn == isIn) return; // Toujours dans le même état (dedans ou dehors).
 
         plugin.syncZoneState(player);
+
+        // Le joueur vient de SORTIR de la zone : si l'option est activée,
+        // on le tue immédiatement (sauf s'il a la permission de bypass).
+        if (wasIn && !isIn && zone.isKillOutside()
+                && !player.hasPermission("compasshotbar.zone.bypass")
+                && player.getGameMode() != org.bukkit.GameMode.CREATIVE
+                && player.getGameMode() != org.bukkit.GameMode.SPECTATOR) {
+            String message = zone.getKillOutsideMessage();
+            if (message != null && !message.isEmpty()) {
+                player.sendMessage(HotbarManager.colorize(message));
+            }
+            player.setHealth(0.0);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

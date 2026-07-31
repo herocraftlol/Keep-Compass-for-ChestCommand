@@ -30,6 +30,13 @@ public class CompassTabCompleter implements TabCompleter {
                 completions.add("enable");
                 completions.add("disable");
                 completions.add("info");
+                completions.add("killoutside");
+            }
+        } else if (args.length == 3 && args[0].equalsIgnoreCase("zone")
+                && args[1].equalsIgnoreCase("killoutside")) {
+            if (sender.hasPermission("compasshotbar.command")) {
+                completions.add("enable");
+                completions.add("disable");
             }
         }
 

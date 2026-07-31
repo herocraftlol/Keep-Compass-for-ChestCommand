@@ -1,5 +1,5 @@
 name: CompassHotbar
-version: 1.5.0
+version: 1.5.1
 main: com.compasshotbar.CompassHotbar
 api-version: '1.21'
 description: Keep fixed clickable items (compass, shop, website, discord, friends...) in the hotbar, with a customizable Velocity-aware server selector GUI on the compass
@@ -18,12 +18,15 @@ commands:
     description: Set the second corner of the lobby zone (block you are looking at)
     usage: /compasshotbar pos2
   compasshotbar zone:
-    description: Enable/disable/inspect the lobby zone restriction
-    usage: /compasshotbar zone <enable|disable|info>
+    description: Enable/disable/inspect the lobby zone restriction, or toggle kill-outside-zone
+    usage: /compasshotbar zone <enable|disable|info|killoutside>
 permissions:
   compasshotbar.use:
     description: Allows the player to use the compass hotbar feature
     default: true
   compasshotbar.command:
     description: Allows the player to toggle/configure the compass hotbar
+    default: op
+  compasshotbar.zone.bypass:
+    description: Exempts the player from being killed when leaving the zone (kill-outside option)
     default: op
