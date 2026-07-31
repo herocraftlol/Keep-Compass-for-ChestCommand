@@ -1,4 +1,15 @@
 com/compasshotbar/CompassCommand.class
-com/compasshotbar/CompassHotbar.class
+com/compasshotbar/ProxyBridge.class
+com/compasshotbar/ActionHandler$1.class
+com/compasshotbar/ActionHandler.class
+com/compasshotbar/HotbarItem$ActionType.class
+com/compasshotbar/ServerGuiManager.class
 com/compasshotbar/CompassTabCompleter.class
+com/compasshotbar/HotbarItem.class
+com/compasshotbar/ServerGuiItem.class
+com/compasshotbar/ZoneManager.class
+com/compasshotbar/ServerStatus.class
+com/compasshotbar/ServerGuiHolder.class
+com/compasshotbar/CompassHotbar.class
+com/compasshotbar/HotbarManager.class
 com/compasshotbar/PlayerListener.class

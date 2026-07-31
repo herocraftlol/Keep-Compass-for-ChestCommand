@@ -6,11 +6,11 @@
 
     <groupId>com.compasshotbar</groupId>
     <artifactId>CompassHotbar</artifactId>
-    <version>1.5.1</version>
+    <version>1.5.2</version>
     <packaging>jar</packaging>
 
     <name>CompassHotbar</name>
-    <description>Keep fixed clickable items (compass, shop, website, discord, friends...) in the hotbar, with zone restriction, global mode, per-item zone settings, and a customizable Velocity-aware server selector GUI</description>
+    <description>Plugin Minecraft Spigot/Paper 1.21+ qui garde automatiquement des items fixes et cliquables dans la hotbar avec restriction de zone, mode global, paramètres par item et menu de sélection de serveurs compatible Velocity</description>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

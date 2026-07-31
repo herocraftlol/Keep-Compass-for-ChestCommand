@@ -1,4 +1,13 @@
-/workspace/project/Keep-Compass-for-ChestCommand/src/main/java/com/compasshotbar/CompassCommand.java
-/workspace/project/Keep-Compass-for-ChestCommand/src/main/java/com/compasshotbar/CompassHotbar.java
-/workspace/project/Keep-Compass-for-ChestCommand/src/main/java/com/compasshotbar/CompassTabCompleter.java
-/workspace/project/Keep-Compass-for-ChestCommand/src/main/java/com/compasshotbar/PlayerListener.java
+/workspace/project/src/main/java/com/compasshotbar/ActionHandler.java
+/workspace/project/src/main/java/com/compasshotbar/CompassCommand.java
+/workspace/project/src/main/java/com/compasshotbar/CompassHotbar.java
+/workspace/project/src/main/java/com/compasshotbar/CompassTabCompleter.java
+/workspace/project/src/main/java/com/compasshotbar/HotbarItem.java
+/workspace/project/src/main/java/com/compasshotbar/HotbarManager.java
+/workspace/project/src/main/java/com/compasshotbar/PlayerListener.java
+/workspace/project/src/main/java/com/compasshotbar/ProxyBridge.java
+/workspace/project/src/main/java/com/compasshotbar/ServerGuiHolder.java
+/workspace/project/src/main/java/com/compasshotbar/ServerGuiItem.java
+/workspace/project/src/main/java/com/compasshotbar/ServerGuiManager.java
+/workspace/project/src/main/java/com/compasshotbar/ServerStatus.java
+/workspace/project/src/main/java/com/compasshotbar/ZoneManager.java

@@ -25,10 +25,6 @@ et un accès au menu amis.
   de zone et d'afficher la hotbar partout sur le serveur, sans modifier la configuration
   de la zone. Utilisez `/compasshotbar global on` pour activer et `/compasshotbar global off`
   pour revenir au comportement normal
-- **Mode "Kill Outside"** : si activé, tout joueur qui sort de la zone définie est
-  immédiatement éliminé. Idéal pour les modes arène ou guerre où quitter la zone est fatal.
-  Les joueurs avec la permission `compasshotbar.zone.bypass` sont免疫. Commandes :
-  `/compasshotbar zone killoutside enable` et `/compasshotbar zone killoutside disable`
 - **Items avec paramètres de zone individuels** : chaque item peut être configuré pour
   s'afficher ou non en dehors de la zone définie via le paramètre `showOutsideZone`
 - **Commandes admin** : activez/désactivez le plugin avec `/compasshotbar`
@@ -64,8 +60,6 @@ des 9 slots de la hotbar) directement dans `config.yml`.
 | /compasshotbar zone enable | Active la restriction de zone |
 | /compasshotbar zone disable | Désactive la restriction de zone |
 | /compasshotbar zone info | Affiche les infos de la zone définie |
-| /compasshotbar zone killoutside enable | Active le mode kill-outside (tue les joueurs qui sortent) |
-| /compasshotbar zone killoutside disable | Désactive le mode kill-outside |
 | /compasshotbar global on | Active le mode global (hotbar partout) |
 | /compasshotbar global off | Désactive le mode global |
 | /compasshotbar global status | Affiche l'état du mode global |
@@ -85,7 +79,6 @@ des 9 slots de la hotbar) directement dans `config.yml`.
 
 - `compasshotbar.use` : donne les items automatiquement (par défaut: true)
 - `compasshotbar.command` : permet d'utiliser les commandes admin (par défaut: op)
-- `compasshotbar.zone.bypass` : exempté de la fonctionnalité kill-outside (par défaut: op)
 
 ## ⚙️ Configuration
 
@@ -93,11 +86,6 @@ Modifiez `plugins/CompassHotbar/config.yml` :
 
 ```yaml
 enabled: true
-
-zone:
-  enabled: false
-  kill-outside: false          # Si true, tue le joueur qui sort de la zone
-  kill-outside-message: "&6[CompassHotbar] &cVous êtes sorti de la zone, vous avez été éliminé !"
 
 hotbar-items:
   shop:
@@ -186,7 +174,7 @@ principe : ping des serveurs + envoi du même format texte sur
 mvn clean package
 ```
 
-Le JAR sera dans `target/CompassHotbar-1.5.1.jar`.
+Le JAR sera dans `target/CompassHotbar-1.5.2.jar`.
 
 Pour le plugin proxy (facultatif mais recommandé pour les vrais chiffres) :
 
@@ -196,3 +184,26 @@ mvn clean package
 ```
 
 Le JAR sera dans `CompassHotbarVelocity/target/CompassHotbarVelocity-1.0.0.jar`.
+
+---
+
+## 📝 Historique des versions
+
+### v1.5.2
+- Correction de bugs et améliorations générales
+- Optimisation du code source
+
+### v1.5.1
+- Amélioration du mode "Kill Outside" pour les zones de jeu
+- Meilleure gestion des permissions
+- Corrections de bugs
+
+### v1.5.0
+- **Nouveau : Menu "Serveurs & Mini-jeux"** sur la boussole
+  - Liste des serveurs avec statut en temps réel (ouvert/fermé)
+  - Nombre de joueurs en direct
+  - Effet brillant sur les serveurs ouverts
+  - Transfert vers les serveurs via le proxy
+- **Mode "Kill Outside"** : élimine les joueurs qui sortent de la zone
+- Système de synchronisation avec le proxy Velocity
+- Amélioration de la configuration des items individuels

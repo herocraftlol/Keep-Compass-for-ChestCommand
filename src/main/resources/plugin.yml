@@ -1,8 +1,8 @@
 name: CompassHotbar
-version: 1.5.1
+version: 1.5.2
 main: com.compasshotbar.CompassHotbar
 api-version: '1.21'
-description: Keep fixed clickable items (compass, shop, website, discord, friends...) in the hotbar, with a customizable Velocity-aware server selector GUI on the compass
+description: Gardez des items fixes et cliquables dans votre hotbar - boussole, boutique, site, Discord, amis - avec restriction de zone, mode global et menu de serveurs compatible Velocity
 author: Developer
 commands:
   compasshotbar:

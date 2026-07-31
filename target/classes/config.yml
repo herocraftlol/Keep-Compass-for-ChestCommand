@@ -3,8 +3,242 @@
 # Enable or disable the plugin by default (can be toggled with command)
 enabled: true
 
-# Message displayed when compass is restored
-restored-message: "&6[CompassHotbar] &aVotre boussole a été restaurée dans votre hotbar!"
+# Message affiché quand un item manquant est restauré dans la hotbar
+restored-message: "&6[CompassHotbar] &aVos items ont été restaurés dans votre hotbar!"
 
-# Message displayed when player tries to drop the compass
-drop-blocked-message: "&6[CompassHotbar] &cVous ne pouvez pas lâcher votre boussole!"
+# Message affiché quand un joueur essaie de lâcher un item du plugin
+drop-blocked-message: "&6[CompassHotbar] &cVous ne pouvez pas lâcher cet item!"
+
+# ============================================================
+# Zone "lobby" (facultatif)
+# ============================================================
+# Si "enabled: true", chaque item de la hotbar suit la règle suivante :
+#   - à l'intérieur de la zone définie par pos1/pos2 (bornes incluses) :
+#     tous les items activés s'affichent normalement.
+#   - à l'extérieur de la zone : seuls les items ayant
+#     "show-outside-zone: true" restent affichés (voir plus bas, section
+#     hotbar-items). Par défaut, seule la boussole a cette option activée :
+#     hors zone, tous les items cliquables (boutique, site, discord, amis...)
+#     disparaissent, et reviennent automatiquement dès que le joueur rentre
+#     dans la zone.
+#
+# Pour définir la zone en jeu (permission compasshotbar.command requise) :
+#   1. Regardez le premier bloc de coin de la zone, puis /compasshotbar pos1
+#   2. Regardez le bloc de coin opposé, puis /compasshotbar pos2
+#   3. /compasshotbar zone enable
+#
+# Autres commandes :
+#   /compasshotbar zone disable  -> désactive la restriction (hotbar partout)
+#   /compasshotbar zone info     -> affiche la zone actuellement définie
+#
+# Ces valeurs sont normalement gérées automatiquement par les commandes
+# ci-dessus, mais peuvent aussi être éditées ici directement.
+# Si "kill-outside: true", tout joueur qui SORT de la zone (alors que
+# "enabled: true" ci-dessus) est immédiatement tué. Utile pour un mode
+# arène/guerre où quitter la zone doit être fatal. Les joueurs qui
+# rentrent dans la zone ne sont bien sûr jamais tués. Un joueur avec la
+# permission "compasshotbar.zone.bypass" n'est jamais tué par cette
+# fonctionnalité (pratique pour le staff).
+#
+# Commandes :
+#   /compasshotbar zone killoutside enable   -> active la fonctionnalité
+#   /compasshotbar zone killoutside disable  -> la désactive
+zone:
+  enabled: false
+  kill-outside: false
+  kill-outside-message: "&6[CompassHotbar] &cVous êtes sorti de la zone, vous avez été éliminé !"
+  world: null
+  pos1:
+    x: 0
+    y: 0
+    z: 0
+  pos2:
+    x: 0
+    y: 0
+    z: 0
+
+# ============================================================
+# Items fixes de la hotbar
+# ============================================================
+# Chaque entrée définit un item protégé (impossible à lâcher/déplacer)
+# qui est automatiquement (re)placé dans le slot indiqué.
+#
+# - slot        : 0 à 8 (0 = tout à gauche, 8 = tout à droite de la hotbar)
+# - material    : n'importe quel Material Bukkit (ex: EMERALD, COBWEB, HEART_OF_THE_SEA...)
+# - name / lore : supportent les codes couleur avec "&"
+# - url         : si renseigné, un clic droit envoie un message cliquable
+#                 dans le chat qui ouvre ce lien dans le navigateur du joueur.
+#                 (Minecraft Java ne permet pas d'ouvrir un navigateur sans
+#                 interaction du joueur : cliquer sur le message est l'action
+#                 la plus proche d'un lien "direct" possible côté client.)
+# - command     : si renseigné (et pas d'url), la commande est exécutée
+#                 en tant que joueur lors du clic droit (sans le "/").
+# - click-message : message cliquable personnalisé pour les items "url"
+#                   (optionnel, sinon un message par défaut est utilisé).
+# - actionbar-message : petit rappel affiché au-dessus de la hotbar au clic
+#                        droit (optionnel). Pour "url", un texte par défaut
+#                        est utilisé si non renseigné.
+# - sound       : son joué au clic droit (optionnel). Doit correspondre à un
+#                 nom de l'enum Bukkit Sound (ex: ENTITY_EXPERIENCE_ORB_PICKUP,
+#                 UI_BUTTON_CLICK, BLOCK_NOTE_BLOCK_PLING...). Par défaut :
+#                 ENTITY_EXPERIENCE_ORB_PICKUP pour les liens, UI_BUTTON_CLICK
+#                 pour les commandes.
+# - show-outside-zone : (optionnel, false par défaut) si la zone "lobby"
+#                 ci-dessus est activée, détermine si CET item précis reste
+#                 affiché quand le joueur est hors zone. La boussole l'a à
+#                 "true" par défaut : elle reste utilisable partout. Les
+#                 autres items (boutique, site, discord, amis...) restent à
+#                 "false" : ils ne s'affichent que dans la zone. Si la zone
+#                 n'est pas activée, cette option n'a aucun effet (tous les
+#                 items s'affichent partout, comme avant).
+hotbar-items:
+
+  compass:
+    enabled: true
+    slot: 8
+    material: COMPASS
+    show-outside-zone: true
+    # Si true, le clic-droit sur cet item ouvre le menu "Serveurs & Mini-jeux"
+    # défini dans la section "servers-gui" plus bas, au lieu de son
+    # comportement normal (rien, pour la boussole vanilla).
+    opens-gui: true
+
+  shop:
+    enabled: true
+    slot: 0
+    material: EMERALD
+    name: "&a&lBoutique"
+    lore:
+      - "&7Clique-droit pour accéder"
+      - "&7à la boutique du serveur"
+    url: "https://votre-boutique.tebex.io"
+    click-message: "&a&l✔ &fClique ici pour ouvrir la &a&lBoutique&f !"
+    actionbar-message: "&e➤ &fClique sur le lien dans le chat pour ouvrir la boutique !"
+    sound: "ENTITY_EXPERIENCE_ORB_PICKUP"
+    show-outside-zone: false
+
+  website:
+    enabled: true
+    slot: 1
+    material: COBWEB
+    name: "&f&lSite Web"
+    lore:
+      - "&7Clique-droit pour visiter"
+      - "&7notre site internet"
+    url: "https://votre-site.fr"
+    click-message: "&f&l✔ &fClique ici pour ouvrir notre &f&lSite Web&f !"
+    show-outside-zone: false
+
+  discord:
+    enabled: true
+    slot: 2
+    material: HEART_OF_THE_SEA
+    name: "&9&lDiscord"
+    lore:
+      - "&7Clique-droit pour rejoindre"
+      - "&7notre serveur Discord"
+    url: "https://discord.gg/votre-invite"
+    click-message: "&9&l✔ &fClique ici pour rejoindre notre &9&lDiscord&f !"
+    show-outside-zone: false
+
+  friends:
+    enabled: true
+    slot: 3
+    material: PLAYER_HEAD
+    name: "&d&lAmis"
+    lore:
+      - "&7Clique-droit pour ouvrir"
+      - "&7le menu des amis"
+    command: "friend gui"
+    actionbar-message: "&d✔ &fMenu Amis ouvert !"
+    sound: "UI_BUTTON_CLICK"
+    show-outside-zone: false
+
+# ============================================================
+# Menu "Serveurs & Mini-jeux" (ouvert par la boussole si opens-gui: true)
+# ============================================================
+# Ce menu affiche une icône par serveur/mini-jeu de votre réseau, avec son
+# statut (ouvert/fermé) et son nombre de joueurs en direct. Ces données
+# viennent du petit plugin Velocity fourni séparément
+# (CompassHotbarVelocity) : installez-le dans le dossier plugins/ de
+# votre proxy Velocity pour que les compteurs se remplissent. Sans lui,
+# les icônes afficheront simplement "Chargement..." (voir no-data-lore).
+#
+# IMPORTANT : ce plugin (CompassHotbar) tourne sur chaque serveur BACKEND
+# (lobby, skywars, bedwars, ...) ; le plugin CompassHotbarVelocity tourne
+# UNIQUEMENT sur le proxy Velocity. Le champ "server" de chaque icône doit
+# correspondre exactement au nom du serveur tel que déclaré dans le
+# velocity.toml du proxy (section [servers]).
+servers-gui:
+  enabled: true
+  title: "&8&lServeurs & Mini-jeux"
+  # Nombre de lignes du menu (1 à 6, donc jusqu'à 54 slots).
+  rows: 3
+  # Au-delà de cet âge (en secondes), une donnée reçue de Velocity est
+  # considérée périmée et l'icône repasse en "Chargement..." plutôt que
+  # d'afficher un chiffre potentiellement faux (proxy/serveur redémarré...).
+  sync-max-age-seconds: 15
+  # Nombre de joueurs max utilisé dans {max} si Velocity ne le précise pas
+  # (ping échoué, serveur inconnu, etc.)
+  fallback-max-players: 100
+  fill-empty-slots: true
+  filler-material: GRAY_STAINED_GLASS_PANE
+
+  # Lore affiché tant qu'aucune donnée n'a encore été reçue pour ce serveur.
+  no-data-lore:
+    - "&7Statut : &eChargement..."
+    - "&8(en attente du proxy)"
+
+  # Lore affiché quand le serveur répond au ping (ouvert), avec les
+  # placeholders {online} et {max}.
+  open-lore-template:
+    - "&7Statut : &a&l● Ouvert"
+    - "&7Joueurs : &f{online}&7/&f{max}"
+    - ""
+    - "&e▶ Clique pour rejoindre"
+
+  # Lore affiché quand le serveur ne répond pas au ping (fermé/hors ligne).
+  closed-lore-template:
+    - "&7Statut : &c&l● Fermé"
+    - ""
+    - "&cServeur indisponible pour le moment"
+
+  # Une entrée par serveur/mini-jeu. "server" = nom exact dans velocity.toml.
+  # "slot" va de 0 à (rows*9 - 1). "glow-when-open" ajoute un léger effet
+  # brillant sur l'icône quand le serveur est ouvert.
+  items:
+    lobby:
+      slot: 10
+      material: GRASS_BLOCK
+      name: "&a&lHub / Lobby"
+      server: "lobby"
+      glow-when-open: false
+      extra-lore:
+        - "&7Retour au hub principal"
+
+    skywars:
+      slot: 12
+      material: DIAMOND_SWORD
+      name: "&b&lSkyWars"
+      server: "skywars-1"
+      glow-when-open: true
+      extra-lore:
+        - "&7Combats aériens sur des îles"
+
+    bedwars:
+      slot: 14
+      material: RED_BED
+      name: "&c&lBedWars"
+      server: "bedwars-1"
+      glow-when-open: true
+      extra-lore:
+        - "&7Protège ton lit, détruis les autres !"
+
+    survival:
+      slot: 16
+      material: IRON_PICKAXE
+      name: "&6&lSurvie"
+      server: "survival"
+      glow-when-open: true
+      extra-lore:
+        - "&7Mine, construis, survis"
