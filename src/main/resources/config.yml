@@ -33,8 +33,20 @@ drop-blocked-message: "&6[CompassHotbar] &cVous ne pouvez pas lâcher cet item!"
 #
 # Ces valeurs sont normalement gérées automatiquement par les commandes
 # ci-dessus, mais peuvent aussi être éditées ici directement.
+# Si "kill-outside: true", tout joueur qui SORT de la zone (alors que
+# "enabled: true" ci-dessus) est immédiatement tué. Utile pour un mode
+# arène/guerre où quitter la zone doit être fatal. Les joueurs qui
+# rentrent dans la zone ne sont bien sûr jamais tués. Un joueur avec la
+# permission "compasshotbar.zone.bypass" n'est jamais tué par cette
+# fonctionnalité (pratique pour le staff).
+#
+# Commandes :
+#   /compasshotbar zone killoutside enable   -> active la fonctionnalité
+#   /compasshotbar zone killoutside disable  -> la désactive
 zone:
   enabled: false
+  kill-outside: false
+  kill-outside-message: "&6[CompassHotbar] &cVous êtes sorti de la zone, vous avez été éliminé !"
   world: null
   pos1:
     x: 0

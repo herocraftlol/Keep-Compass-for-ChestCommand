@@ -17,6 +17,8 @@ public class ZoneManager {
     private final CompassHotbar plugin;
 
     private boolean enabled;
+    private boolean killOutside;
+    private String killOutsideMessage;
     private String worldName;
     private Integer x1, y1, z1;
     private Integer x2, y2, z2;
@@ -34,12 +36,17 @@ public class ZoneManager {
 
         if (section == null) {
             enabled = false;
+            killOutside = false;
+            killOutsideMessage = null;
             worldName = null;
             x1 = y1 = z1 = x2 = y2 = z2 = null;
             return;
         }
 
         enabled = section.getBoolean("enabled", false);
+        killOutside = section.getBoolean("kill-outside", false);
+        killOutsideMessage = section.getString("kill-outside-message",
+                "&6[CompassHotbar] &cVous êtes sorti de la zone, vous avez été éliminé !");
         worldName = section.getString("world", null);
 
         ConfigurationSection pos1 = section.getConfigurationSection("pos1");
@@ -62,6 +69,7 @@ public class ZoneManager {
      */
     public void save() {
         plugin.getConfig().set("zone.enabled", enabled);
+        plugin.getConfig().set("zone.kill-outside", killOutside);
         plugin.getConfig().set("zone.world", worldName);
 
         if (x1 != null) {
@@ -85,6 +93,27 @@ public class ZoneManager {
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
         save();
+    }
+
+    /**
+     * True si un joueur qui sort de la zone (alors que la zone est activée)
+     * doit être tué immédiatement.
+     */
+    public boolean isKillOutside() {
+        return killOutside;
+    }
+
+    public void setKillOutside(boolean killOutside) {
+        this.killOutside = killOutside;
+        save();
+    }
+
+    /**
+     * Message (déjà avec codes couleur "&") envoyé au joueur juste avant
+     * qu'il ne soit tué pour être sorti de la zone. Peut être null/vide.
+     */
+    public String getKillOutsideMessage() {
+        return killOutsideMessage;
     }
 
     /**
@@ -153,6 +182,7 @@ public class ZoneManager {
         lines.add(HotbarManager.colorize("&7Pos1 : &f" + x1 + ", " + y1 + ", " + z1));
         lines.add(HotbarManager.colorize("&7Pos2 : &f" + x2 + ", " + y2 + ", " + z2));
         lines.add(HotbarManager.colorize("&7Activée : " + (enabled ? "&aoui" : "&cnon")));
+        lines.add(HotbarManager.colorize("&7Kill hors zone : " + (killOutside ? "&aoui" : "&cnon")));
         return lines;
     }
 }

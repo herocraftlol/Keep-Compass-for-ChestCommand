@@ -132,7 +132,7 @@ public class CompassCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 if (args.length < 2) {
-                    sender.sendMessage("§6[CompassHotbar] §cUsage: /compasshotbar zone <enable|disable|info>");
+                    sender.sendMessage("§6[CompassHotbar] §cUsage: /compasshotbar zone <enable|disable|info|killoutside>");
                     return true;
                 }
 
@@ -163,8 +163,31 @@ public class CompassCommand implements CommandExecutor, TabCompleter {
                         }
                         break;
 
+                    case "killoutside":
+                        if (args.length < 3) {
+                            sender.sendMessage("§6[CompassHotbar] §cUsage: /compasshotbar zone killoutside <enable|disable>");
+                            return true;
+                        }
+
+                        switch (args[2].toLowerCase()) {
+                            case "enable":
+                                plugin.getZoneManager().setKillOutside(true);
+                                sender.sendMessage("§6[CompassHotbar] §aLes joueurs qui sortent de la zone seront désormais tués !");
+                                break;
+
+                            case "disable":
+                                plugin.getZoneManager().setKillOutside(false);
+                                sender.sendMessage("§6[CompassHotbar] §7Les joueurs qui sortent de la zone ne seront plus tués.");
+                                break;
+
+                            default:
+                                sender.sendMessage("§6[CompassHotbar] §cUsage: /compasshotbar zone killoutside <enable|disable>");
+                                break;
+                        }
+                        break;
+
                     default:
-                        sender.sendMessage("§6[CompassHotbar] §cUsage: /compasshotbar zone <enable|disable|info>");
+                        sender.sendMessage("§6[CompassHotbar] §cUsage: /compasshotbar zone <enable|disable|info|killoutside>");
                         break;
                 }
                 break;
@@ -197,6 +220,13 @@ public class CompassCommand implements CommandExecutor, TabCompleter {
                 completions.add("enable");
                 completions.add("disable");
                 completions.add("info");
+                completions.add("killoutside");
+            }
+        } else if (args.length == 3 && args[0].equalsIgnoreCase("zone")
+                && args[1].equalsIgnoreCase("killoutside")) {
+            if (sender.hasPermission("compasshotbar.command")) {
+                completions.add("enable");
+                completions.add("disable");
             }
         }
 
